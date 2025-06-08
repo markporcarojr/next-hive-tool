@@ -1,58 +1,6 @@
-/* File: styles/globals.css */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Navbar Styles */
 
-/* Global CSS Variables (Light mode defaults) */
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-
-  /* Honey color palette */
-  --color-honey: #f4b400;
-  --color-amber: #ffb703;
-  --color-cream: #fff8e1;
-  --color-brown: #5d4037;
-  --color-deep: #3e2723;
-}
-
-/* Dark mode overrides */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    /* Optional: Add darker variants of honey palette here if needed */
-  }
-}
-
-/* Body styling */
-body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-/* Optional Honey Utility Classes */
-.text-michgold {
-  color: #f1c40f;
-}
-.bg-inputgrey {
-  background-color: #2c3e50;
-}
-.border-michgold {
-  border-color: #f1c40f;
-}
-.btn-michgold {
-  background-color: #f1c40f;
-  color: black;
-}
-.btn-michgold:hover {
-  background-color: #d4ac0d;
-}
-
-/* ---------------------- */
-/* Navbar Custom Styling */
-/* ---------------------- */
+/* Base Navbar */
 .navbar {
   height: 100vh;
   width: 280px;
@@ -63,10 +11,12 @@ body {
   background-color: var(--color-amber);
 }
 
+/* Main Section */
 .navbarMain {
   flex: 1;
 }
 
+/* Header */
 .header {
   padding-bottom: var(--mantine-spacing-md);
   margin-bottom: calc(var(--mantine-spacing-md) * 1.5);
@@ -74,12 +24,14 @@ body {
   color: var(--color-deep);
 }
 
-.footer {
+/* Footer */
+/* .footer {
   padding-top: var(--mantine-spacing-md);
   margin-top: var(--mantine-spacing-md);
   border-top: 2px solid var(--color-honey);
-}
+} */
 
+/* Links */
 .link {
   display: flex;
   align-items: center;
@@ -104,6 +56,7 @@ body {
   height: 24px;
 }
 
+/* Active link */
 .link[data-active="true"] {
   background-color: var(--color-deep);
   color: var(--color-cream);
