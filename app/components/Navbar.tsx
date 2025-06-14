@@ -3,14 +3,13 @@
 import { Group } from "@mantine/core";
 import {
   IconArchive,
-  IconDatabaseImport,
-  IconWind,
   IconLayoutDashboard,
   IconListCheck,
   IconLogout,
   IconSeedling,
   IconSettings,
   IconTool,
+  IconWind,
 } from "@tabler/icons-react";
 
 import Link from "next/link";
