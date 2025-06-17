@@ -9,6 +9,7 @@ import {
   Stack,
   Text,
   Title,
+  SimpleGrid,
 } from "@mantine/core";
 import {
   Bar,
@@ -52,13 +53,27 @@ export default function HomePage() {
 
         <Grid.Col span={{ base: 12, md: 6 }}>
           <Card shadow="sm" padding="lg" radius="md" withBorder>
-            <Text fw={500}>Total Hives</Text>
-            <Title order={3}>12</Title>
+            <SimpleGrid cols={2} spacing="lg">
+              <div>
+                <Text fw={500}>Total Hives</Text>
+                <Title order={3}>12</Title>
+              </div>
 
-            <Text fw={500} mt="md">
-              Swarms This Season
-            </Text>
-            <Title order={3}>2</Title>
+              <div>
+                <Text fw={500}>Swarms This Season</Text>
+                <Title order={3}>2</Title>
+              </div>
+
+              <div>
+                <Text fw={500}>Swarm Traps Set</Text>
+                <Title order={3}>2</Title>
+              </div>
+
+              <div>
+                <Text fw={500}>Some Other Stat</Text>
+                <Title order={3}>X</Title>
+              </div>
+            </SimpleGrid>
           </Card>
         </Grid.Col>
 

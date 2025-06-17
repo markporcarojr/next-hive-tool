@@ -4,6 +4,7 @@ import { Inter } from "next/font/google";
 import { ReactNode } from "react";
 import Navbar from "../app/components/Navbar";
 import { MantineProvider } from "@mantine/core";
+import { Notifications } from "@mantine/notifications";
 import "@mantine/core/styles.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -38,6 +39,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             fontFamily: inter.style.fontFamily,
           }}
         >
+          <Notifications position="top-right" />
           <div className="flex min-h-screen">
             <Navbar />
             <main className="flex-1 p-6 overflow-auto bg-[#fff8e1] text-[#3e2723] dark:bg-[#0a0a0a] dark:text-[#ededed] transition-colors duration-300 ease-in-out">
