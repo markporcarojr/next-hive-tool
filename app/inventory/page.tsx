@@ -1,23 +1,20 @@
 "use client";
 
 import {
-  Container,
-  Title,
-  Text,
-  Button,
-  Group,
-  Stack,
-  Divider,
   ActionIcon,
-  Modal,
-  TextInput,
   Box,
-  rem,
+  Button,
+  Container,
+  Group,
+  Modal,
+  Stack,
+  Text,
+  TextInput,
+  Title,
 } from "@mantine/core";
-import { IconPlus, IconTrash } from "@tabler/icons-react";
-import { useState } from "react";
 import { showNotification } from "@mantine/notifications";
-import { IconCheck, IconX } from "@tabler/icons-react";
+import { IconPlus, IconTrash, IconX } from "@tabler/icons-react";
+import { useState } from "react";
 
 export default function InventoryPage() {
   const [inventory, setInventory] = useState([
