@@ -21,6 +21,12 @@ type HarvestFormValues = {
   harvestDate: Date;
 };
 
+const defaultValues = {
+  harvestAmount: 0,
+  harvestType: "",
+  harvestDate: new Date(),
+};
+
 export default function CreateHarvestPage() {
   const {
     register,
@@ -29,7 +35,9 @@ export default function CreateHarvestPage() {
     watch,
     reset,
     formState: { errors },
-  } = useForm<HarvestFormValues>();
+  } = useForm<HarvestFormValues>({
+    defaultValues,
+  });
 
   const [submitting, setSubmitting] = useState(false);
 
@@ -52,24 +60,32 @@ export default function CreateHarvestPage() {
 
       if (!res.ok) {
         notifications.show({
-          title: "Error",
-          message: result?.errors?.[0] || result.message || "Submission failed",
+          title: "Error Saving Harvest",
+          message:
+            result?.errors?.[0] || result.message || "Submission failed.",
           color: "red",
+          autoClose: 4000,
+          withBorder: true,
         });
       } else {
         notifications.show({
-          title: "Success",
-          message: "Harvest successfully recorded!",
+          title: "Harvest Added!",
+          message: `Recorded ${data.harvestAmount} lbs of ${data.harvestType}`,
           color: "green",
+          autoClose: 3000,
+          withBorder: true,
         });
-        reset();
+
+        reset(defaultValues);
       }
     } catch (error) {
       console.error(error);
       notifications.show({
-        title: "Error",
-        message: "Something went wrong.",
+        title: "Network Error",
+        message: "Could not save harvest. Please try again.",
         color: "red",
+        autoClose: 4000,
+        withBorder: true,
       });
     } finally {
       setSubmitting(false);

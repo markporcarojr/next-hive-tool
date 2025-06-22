@@ -9,6 +9,7 @@ import {
 } from "@clerk/nextjs";
 import { MantineProvider } from "@mantine/core";
 import "@mantine/core/styles.css";
+import "@mantine/notifications/styles.css";
 import { Notifications } from "@mantine/notifications";
 import { Inter } from "next/font/google";
 import { ReactNode } from "react";
