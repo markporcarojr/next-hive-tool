@@ -1,9 +1,18 @@
-// app/api/harvest/route.ts
 import { NextRequest, NextResponse } from "next/server";
+import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { harvestSchema } from "@/lib/schemas/harvest";
+import { checkUser } from "@/lib/auth/checkUser";
 
 export async function POST(req: NextRequest) {
+  const { userId } = await auth();
+  if (!userId) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
+  // 👇 Ensure user exists in DB
+  await checkUser();
+
   try {
     const body = await req.json();
     const parsed = harvestSchema.safeParse(body);
@@ -15,13 +24,21 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { harvestType, harvestAmount, harvestDate, userId } = parsed.data;
+    const { harvestType, harvestAmount, harvestDate } = parsed.data;
+
+    const parsedDate = new Date(harvestDate);
+    if (isNaN(parsedDate.getTime())) {
+      return NextResponse.json(
+        { message: "Invalid harvestDate" },
+        { status: 400 }
+      );
+    }
 
     const harvest = await prisma.harvest.create({
       data: {
         harvestType,
         harvestAmount,
-        harvestDate: new Date(harvestDate),
+        harvestDate: parsedDate,
         userId,
       },
     });
@@ -34,15 +51,23 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
+  const { userId } = await auth();
+  if (!userId) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  // 👇 Ensure user exists in DB
+  await checkUser();
+
   try {
-    const userId = req.nextUrl.searchParams.get("userId");
+    const harvests = await prisma.harvest.findMany({
+      where: { userId },
+      orderBy: { harvestDate: "desc" },
+    });
 
-    // const harvests = await Harvest.find({ userId });
-    const harvests = []; // mock for now
-
-    return NextResponse.json(harvests, { status: 200 });
+    return NextResponse.json(harvests);
   } catch (error) {
-    console.error(error);
+    console.error("[HARVEST_GET]", error);
     return NextResponse.json({ message: "Server error" }, { status: 500 });
   }
 }

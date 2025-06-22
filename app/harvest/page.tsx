@@ -1,16 +1,17 @@
 "use client";
 
-import { useState } from "react";
 import {
-  Card,
-  Title,
-  Text,
-  Stack,
-  Divider,
-  Pagination,
   Badge,
+  Button,
+  Card,
   Group,
+  Pagination,
+  Stack,
+  Text,
+  Title,
 } from "@mantine/core";
+import Link from "next/link";
+import { useState } from "react";
 
 const harvests = [
   {
@@ -67,9 +68,12 @@ export default function HarvestPage() {
 
   return (
     <main style={{ padding: "2rem" }}>
-      <Title order={2} mb="md">
-        Harvest Records
-      </Title>
+      <Group justify="space-between" mb="md">
+        <Title order={2}>Your Harvests</Title>
+        <Button component={Link} href="/harvest/new">
+          Add Harvest
+        </Button>
+      </Group>
 
       <Stack gap="md">
         {displayed.map((entry) => (

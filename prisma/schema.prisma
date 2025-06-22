@@ -15,7 +15,7 @@ datasource db {
 }
 
 model User {
-  id       String    @id @default(cuid())
+  id       String    @id // Will match Clerk's user ID
   email    String    @unique
   harvests Harvest[]
 }
@@ -23,7 +23,7 @@ model User {
 model Harvest {
   id            String   @id @default(cuid())
   harvestType   String
-  harvestAmount Int
+  harvestAmount Float
   harvestDate   DateTime
   userId        String
   user          User     @relation(fields: [userId], references: [id])

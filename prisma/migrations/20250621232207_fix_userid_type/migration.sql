@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "Harvest" ALTER COLUMN "harvestAmount" SET DATA TYPE DOUBLE PRECISION;
