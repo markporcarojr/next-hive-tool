@@ -16,13 +16,15 @@
     "@mantine/hooks": "^8.0.2",
     "@mantine/notifications": "^8.0.2",
     "@prisma/client": "^6.10.0",
+    "@prisma/extension-accelerate": "^2.0.1",
     "@tabler/icons-react": "^3.34.0",
     "dayjs": "^1.11.13",
     "next": "15.3.3",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.58.1",
-    "recharts": "^2.15.3"
+    "recharts": "^2.15.3",
+    "svix": "^1.67.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
