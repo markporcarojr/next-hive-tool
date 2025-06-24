@@ -11,57 +11,30 @@ import {
   Title,
 } from "@mantine/core";
 import Link from "next/link";
-import { useState } from "react";
-
-const harvests = [
-  {
-    id: 1,
-    hive: "Hive #1",
-    weight: 12.3,
-    date: "2025-06-01",
-    location: "Backyard",
-  },
-  {
-    id: 2,
-    hive: "Hive #2",
-    weight: 10.8,
-    date: "2025-05-28",
-    location: "Field",
-  },
-  {
-    id: 3,
-    hive: "Hive #3",
-    weight: 15.1,
-    date: "2025-05-20",
-    location: "Orchard",
-  },
-  {
-    id: 4,
-    hive: "Hive #4",
-    weight: 8.6,
-    date: "2025-05-15",
-    location: "Garden",
-  },
-  {
-    id: 5,
-    hive: "Hive #5",
-    weight: 11.2,
-    date: "2025-05-10",
-    location: "Rooftop",
-  },
-  {
-    id: 6,
-    hive: "Hive #6",
-    weight: 9.7,
-    date: "2025-05-05",
-    location: "Backyard",
-  },
-];
+import { useEffect, useState } from "react";
 
 const ITEMS_PER_PAGE = 4;
 
+type Harvest = {
+  id: number;
+  harvestType: string;
+  harvestAmount: number;
+  harvestDate: string;
+};
+
 export default function HarvestPage() {
+  const [harvests, setHarvests] = useState<Harvest[]>([]);
   const [activePage, setPage] = useState(1);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const res = await fetch("/api/harvest");
+      const data = await res.json();
+      setHarvests(data);
+    };
+
+    fetchData();
+  }, []);
 
   const startIndex = (activePage - 1) * ITEMS_PER_PAGE;
   const displayed = harvests.slice(startIndex, startIndex + ITEMS_PER_PAGE);
@@ -79,13 +52,12 @@ export default function HarvestPage() {
         {displayed.map((entry) => (
           <Card key={entry.id} shadow="sm" padding="lg" radius="md" withBorder>
             <Group justify="space-between">
-              <Title order={4}>{entry.hive}</Title>
+              <Title order={4}>{entry.harvestType}</Title>
               <Badge color="honey" variant="light">
-                {entry.date}
+                {new Date(entry.harvestDate).toLocaleDateString()}
               </Badge>
             </Group>
-            <Text>Weight: {entry.weight} lbs</Text>
-            <Text>Location: {entry.location}</Text>
+            <Text>Amount: {entry.harvestAmount} lbs</Text>
           </Card>
         ))}
       </Stack>

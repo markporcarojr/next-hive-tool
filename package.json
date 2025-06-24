@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@clerk/dev-cli": "^0.0.11",
     "@clerk/nextjs": "^6.22.0",
     "@mantine/core": "^8.0.2",
     "@mantine/dates": "^8.0.2",
@@ -16,7 +17,6 @@
     "@mantine/hooks": "^8.0.2",
     "@mantine/notifications": "^8.0.2",
     "@prisma/client": "^6.10.0",
-    "@prisma/extension-accelerate": "^2.0.1",
     "@tabler/icons-react": "^3.34.0",
     "dayjs": "^1.11.13",
     "next": "15.3.3",
@@ -27,6 +27,7 @@
     "svix": "^1.67.0"
   },
   "devDependencies": {
+    "@clerk/clerk-sdk-node": "^4.13.23",
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
