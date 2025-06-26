@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   Button,
   Container,
@@ -9,12 +11,8 @@ import {
   Title,
 } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
-import "@mantine/dates/styles.css";
 import { notifications } from "@mantine/notifications";
-import { IconPlus } from "@tabler/icons-react";
-import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { useRouter } from "next/navigation";
 
 type HarvestFormValues = {
   harvestAmount: number;
@@ -22,84 +20,91 @@ type HarvestFormValues = {
   harvestDate: Date;
 };
 
-const defaultValues = {
-  harvestAmount: 0,
-  harvestType: "",
-  harvestDate: new Date(),
-};
+export default function EditHarvestPage({
+  params,
+}: {
+  params: { id: string };
+}) {
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
 
-export default function CreateHarvestPage() {
   const {
     register,
     handleSubmit,
     setValue,
     watch,
-    reset,
     formState: { errors },
-  } = useForm<HarvestFormValues>({
-    defaultValues,
-  });
+  } = useForm<HarvestFormValues>();
 
-  const [submitting, setSubmitting] = useState(false);
-  const router = useRouter();
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await fetch("/api/harvest");
+        const data = await res.json();
+        const current = data.find((h: any) => h.id === Number(params.id));
+        if (!current) return router.push("/harvest");
+
+        setValue("harvestAmount", current.harvestAmount);
+        setValue("harvestType", current.harvestType);
+        setValue("harvestDate", new Date(current.harvestDate));
+      } catch (e) {
+        notifications.show({
+          title: "Error",
+          message: "Failed to load data",
+          color: "red",
+        });
+        router.push("/harvest");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [params.id, router, setValue]);
+
   const onSubmit = async (data: HarvestFormValues) => {
-    setSubmitting(true);
     try {
-      const res = await fetch("/api/harvest", {
-        method: "POST",
+      const res = await fetch(`/api/harvest?id=${params.id}`, {
+        method: "PATCH",
         body: JSON.stringify({
           ...data,
-          harvestDate:
-            data.harvestDate instanceof Date
-              ? data.harvestDate.toISOString()
-              : new Date(data.harvestDate).toISOString(),
+          harvestDate: data.harvestDate.toISOString(),
         }),
         headers: { "Content-Type": "application/json" },
       });
 
-      const result = await res.json();
-
       if (!res.ok) {
+        const result = await res.json();
         notifications.show({
-          title: "Error Saving Harvest",
-          message:
-            result?.errors?.[0] || result.message || "Submission failed.",
+          title: "Error",
+          message: result.message || "Update failed",
           color: "red",
-          autoClose: 4000,
-          withBorder: true,
         });
-      } else {
-        notifications.show({
-          title: "Harvest Added!",
-          message: `Recorded ${data.harvestAmount} lbs of ${data.harvestType}`,
-          color: "green",
-          autoClose: 3000,
-          withBorder: true,
-        });
-
-        reset(defaultValues);
+        return;
       }
-    } catch (error) {
-      console.error(error);
+
       notifications.show({
-        title: "Network Error",
-        message: "Could not save harvest. Please try again.",
-        color: "red",
-        autoClose: 4000,
-        withBorder: true,
+        title: "Success",
+        message: "Harvest updated!",
+        color: "green",
       });
-    } finally {
-      setSubmitting(false);
       router.push("/harvest");
+    } catch (e) {
+      notifications.show({
+        title: "Error",
+        message: "Something went wrong",
+        color: "red",
+      });
     }
   };
+
+  if (loading) return <p style={{ padding: "2rem" }}>Loading...</p>;
 
   return (
     <Container size="sm" mt="xl">
       <Title order={2} mb="lg">
-        Add New Harvest
+        Edit Harvest
       </Title>
-
       <form onSubmit={handleSubmit(onSubmit)}>
         <TextInput
           label="Harvest Amount (lbs)"
@@ -126,7 +131,6 @@ export default function CreateHarvestPage() {
           label="Harvest Date"
           placeholder="MM-DD-YYYY"
           valueFormat="MM-DD-YYYY"
-          firstDayOfWeek={0} // Sunday
           value={watch("harvestDate")}
           onChange={(date) => setValue("harvestDate", date!)}
           error={errors.harvestDate && "Required"}
@@ -134,13 +138,7 @@ export default function CreateHarvestPage() {
         />
 
         <Group justify="flex-end" mt="xl">
-          <Button
-            type="submit"
-            leftSection={<IconPlus size={16} />}
-            loading={submitting}
-          >
-            Add Harvest
-          </Button>
+          <Button type="submit">Update</Button>
         </Group>
       </form>
     </Container>
