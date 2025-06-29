@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import {
   Button,
   Container,
@@ -11,14 +10,10 @@ import {
   Title,
 } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
+import { useForm, zodResolver } from "@mantine/form";
+import { useRouter } from "next/navigation";
 import { notifications } from "@mantine/notifications";
-import { useForm } from "react-hook-form";
-
-type HarvestFormValues = {
-  harvestAmount: number;
-  harvestType: string;
-  harvestDate: Date;
-};
+import { HarvestInput, harvestSchema } from "@/lib/schemas/harvest";
 
 export default function EditHarvestPage({
   params,
@@ -28,13 +23,14 @@ export default function EditHarvestPage({
   const router = useRouter();
   const [loading, setLoading] = useState(true);
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-    formState: { errors },
-  } = useForm<HarvestFormValues>();
+  const form = useForm<HarvestInput>({
+    initialValues: {
+      harvestAmount: 0,
+      harvestType: "",
+      harvestDate: new Date(),
+    },
+    validate: zodResolver(harvestSchema),
+  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -44,9 +40,11 @@ export default function EditHarvestPage({
         const current = data.find((h: any) => h.id === Number(params.id));
         if (!current) return router.push("/harvest");
 
-        setValue("harvestAmount", current.harvestAmount);
-        setValue("harvestType", current.harvestType);
-        setValue("harvestDate", new Date(current.harvestDate));
+        form.setValues({
+          harvestAmount: current.harvestAmount,
+          harvestType: current.harvestType,
+          harvestDate: new Date(current.harvestDate),
+        });
       } catch (e) {
         notifications.show({
           title: "Error",
@@ -60,17 +58,17 @@ export default function EditHarvestPage({
     };
 
     fetchData();
-  }, [params.id, router, setValue]);
+  }, [params.id]);
 
-  const onSubmit = async (data: HarvestFormValues) => {
+  const handleSubmit = async (values: HarvestInput) => {
     try {
       const res = await fetch(`/api/harvest?id=${params.id}`, {
         method: "PATCH",
-        body: JSON.stringify({
-          ...data,
-          harvestDate: data.harvestDate.toISOString(),
-        }),
         headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...values,
+          harvestDate: values.harvestDate.toISOString(),
+        }),
       });
 
       if (!res.ok) {
@@ -105,15 +103,11 @@ export default function EditHarvestPage({
       <Title order={2} mb="lg">
         Edit Harvest
       </Title>
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={form.onSubmit(handleSubmit)}>
         <TextInput
           label="Harvest Amount (lbs)"
           type="number"
-          {...register("harvestAmount", {
-            required: true,
-            valueAsNumber: true,
-          })}
-          error={errors.harvestAmount && "Required"}
+          {...form.getInputProps("harvestAmount")}
           mb="md"
         />
 
@@ -121,9 +115,7 @@ export default function EditHarvestPage({
           label="Harvest Type"
           placeholder="Pick one"
           data={["Honey", "Wax"]}
-          value={watch("harvestType")}
-          onChange={(value) => setValue("harvestType", value!)}
-          error={errors.harvestType && "Required"}
+          {...form.getInputProps("harvestType")}
           mb="md"
         />
 
@@ -131,9 +123,7 @@ export default function EditHarvestPage({
           label="Harvest Date"
           placeholder="MM-DD-YYYY"
           valueFormat="MM-DD-YYYY"
-          value={watch("harvestDate")}
-          onChange={(date) => setValue("harvestDate", date!)}
-          error={errors.harvestDate && "Required"}
+          {...form.getInputProps("harvestDate")}
           mb="md"
         />
 
