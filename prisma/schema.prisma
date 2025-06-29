@@ -20,17 +20,7 @@ model User {
   email    String    @unique
   name     String?
   harvests Harvest[]
-  posts    Post[]
-}
-
-model Post {
-  id        Int      @id @default(autoincrement())
-  title     String
-  content   String?
-  published Boolean  @default(false)
-  authorId  Int
-  author    User     @relation(fields: [authorId], references: [id])
-  createdAt DateTime @default(now())
+  Hive     Hive[]
 }
 
 model Harvest {
@@ -38,6 +28,27 @@ model Harvest {
   harvestType   String
   harvestAmount Float
   harvestDate   DateTime
+  userId        Int
+  user          User     @relation(fields: [userId], references: [id])
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Hive {
+  id            Int      @id @default(autoincrement())
+  hiveDate      DateTime
+  hiveNumber    Int
+  hiveSource    String
+  hiveImage     String?
+  broodBoxes    Int?
+  superBoxes    Int?
+  hiveStrength  Int?
+  queenColor    String?
+  queenAge      String?
+  queenExcluder String?
+  breed         String?
+  frames        Int?
+  todo          String?
   userId        Int
   user          User     @relation(fields: [userId], references: [id])
   createdAt     DateTime @default(now())

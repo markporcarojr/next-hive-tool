@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Card,
   Title,
@@ -9,37 +9,55 @@ import {
   Divider,
   Button,
   Pagination,
+  Group,
 } from "@mantine/core";
-
-const hives = [
-  { id: 1, name: "Hive #1", location: "Backyard", status: "Active" },
-  { id: 2, name: "Hive #2", location: "Orchard", status: "Swarmed" },
-  { id: 3, name: "Hive #3", location: "Field", status: "Needs Inspection" },
-  { id: 4, name: "Hive #4", location: "Garden", status: "Active" },
-  { id: 5, name: "Hive #5", location: "Rooftop", status: "Inactive" },
-  { id: 6, name: "Hive #6", location: "Backyard", status: "Swarmed" },
-];
+import Link from "next/link";
+import { HiveInput } from "@/lib/schemas/hive";
 
 const ITEMS_PER_PAGE = 4;
 
 export default function HivePage() {
+  const [hives, setHives] = useState<HiveInput[]>([]);
   const [activePage, setPage] = useState(1);
+  useEffect(() => {
+    const fetchData = async () => {
+      const res = await fetch("/api/hives");
+      const data = await res.json();
+      setHives(data);
+    };
+    fetchData();
+  }, []);
 
   const startIndex = (activePage - 1) * ITEMS_PER_PAGE;
   const displayedHives = hives.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
   return (
     <main style={{ padding: "2rem" }}>
-      <Title order={2} mb="md">
-        Your Hives
-      </Title>
+      <Group justify="space-between" mb="md">
+        <Title order={2}>Your Hives</Title>
+        <Button
+          variant="filled"
+          color="#f4b400"
+          component={Link}
+          href="/hives/new"
+        >
+          Add Hive
+        </Button>
+      </Group>
 
       <Stack gap="md">
         {displayedHives.map((hive) => (
-          <Card key={hive.id} shadow="sm" padding="lg" radius="md" withBorder>
-            <Title order={4}>{hive.name}</Title>
-            <Text>Location: {hive.location}</Text>
-            <Text>Status: {hive.status}</Text>
+          <Card
+            key={hive.hiveNumber}
+            shadow="sm"
+            padding="lg"
+            radius="md"
+            withBorder
+          >
+            <Title order={4}>{hive.hiveNumber}</Title>
+            <Text>Queen Color {hive.queenColor}</Text>
+            <Text>Status: {hive.hiveStrength}</Text>
+            <Text>Todo: {hive.todo}</Text>
             <Divider my="sm" />
             <Button variant="light" color="honey">
               View Details

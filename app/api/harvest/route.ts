@@ -10,7 +10,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
-  // 👇 Look up the user by clerkId
   const user = await prisma.user.findUnique({
     where: { clerkId },
   });
@@ -30,21 +29,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { harvestType, harvestAmount, harvestDate } = parsed.data;
-    const parsedDate = new Date(harvestDate);
-
-    if (isNaN(parsedDate.getTime())) {
-      return NextResponse.json(
-        { message: "Invalid harvestDate" },
-        { status: 400 }
-      );
-    }
+    const data = parsed.data;
 
     const harvest = await prisma.harvest.create({
       data: {
-        harvestType,
-        harvestAmount,
-        harvestDate: parsedDate,
+        ...data,
+        harvestDate: new Date(data.harvestDate), // Ensure date is a Date object
         userId: user.id, // 👈 Use the numeric ID from your DB
       },
     });

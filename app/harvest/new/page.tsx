@@ -1,96 +1,71 @@
 "use client";
 
+import { HarvestInput, harvestSchema } from "@/lib/schemas/harvest"; // ✅ import your schema
 import {
   Button,
   Container,
   Group,
+  NumberInput,
   Select,
-  TextInput,
   Title,
 } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
 import "@mantine/dates/styles.css";
+import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { IconPlus } from "@tabler/icons-react";
-import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { zodResolver } from "mantine-form-zod-resolver";
 import { useRouter } from "next/navigation";
 
-type HarvestFormValues = {
-  harvestAmount: number;
-  harvestType: string;
-  harvestDate: Date;
-};
-
-const defaultValues = {
-  harvestAmount: 0,
-  harvestType: "",
-  harvestDate: new Date(),
-};
-
 export default function CreateHarvestPage() {
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    watch,
-    reset,
-    formState: { errors },
-  } = useForm<HarvestFormValues>({
-    defaultValues,
+  const router = useRouter();
+
+  const form = useForm<HarvestInput>({
+    initialValues: {
+      harvestAmount: 0,
+      harvestType: "",
+      harvestDate: new Date(),
+    },
+    validate: zodResolver(harvestSchema),
   });
 
-  const [submitting, setSubmitting] = useState(false);
-  const router = useRouter();
-  const onSubmit = async (data: HarvestFormValues) => {
-    setSubmitting(true);
+  const onSubmit = async (values: HarvestInput) => {
     try {
       const res = await fetch("/api/harvest", {
         method: "POST",
-        body: JSON.stringify({
-          ...data,
-          harvestDate:
-            data.harvestDate instanceof Date
-              ? data.harvestDate.toISOString()
-              : new Date(data.harvestDate).toISOString(),
-        }),
         headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ...values,
+          harvestDate: values.harvestDate.toISOString(),
+        }),
       });
 
       const result = await res.json();
 
       if (!res.ok) {
         notifications.show({
-          title: "Error Saving Harvest",
-          message:
-            result?.errors?.[0] || result.message || "Submission failed.",
+          title: "Error",
+          message: result?.errors?.harvestType?.[0] || result.message,
           color: "red",
-          autoClose: 4000,
-          withBorder: true,
         });
-      } else {
-        notifications.show({
-          title: "Harvest Added!",
-          message: `Recorded ${data.harvestAmount} lbs of ${data.harvestType}`,
-          color: "green",
-          autoClose: 3000,
-          withBorder: true,
-        });
-
-        reset(defaultValues);
+        return;
       }
+
+      notifications.show({
+        title: "Harvest Added",
+        message: `You recorded ${values.harvestAmount} lbs of ${values.harvestType}`,
+        color: "green",
+      });
+
+      form.reset();
+      router.push("/harvest");
     } catch (error) {
       console.error(error);
       notifications.show({
         title: "Network Error",
         message: "Could not save harvest. Please try again.",
         color: "red",
-        autoClose: 4000,
-        withBorder: true,
       });
-    } finally {
-      setSubmitting(false);
-      router.push("/harvest");
     }
   };
 
@@ -100,15 +75,11 @@ export default function CreateHarvestPage() {
         Add New Harvest
       </Title>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <TextInput
+      <form onSubmit={form.onSubmit(onSubmit)}>
+        <NumberInput
           label="Harvest Amount (lbs)"
           type="number"
-          {...register("harvestAmount", {
-            required: true,
-            valueAsNumber: true,
-          })}
-          error={errors.harvestAmount && "Required"}
+          {...form.getInputProps("harvestAmount")}
           mb="md"
         />
 
@@ -116,9 +87,7 @@ export default function CreateHarvestPage() {
           label="Harvest Type"
           placeholder="Pick one"
           data={["Honey", "Wax"]}
-          value={watch("harvestType")}
-          onChange={(value) => setValue("harvestType", value!)}
-          error={errors.harvestType && "Required"}
+          {...form.getInputProps("harvestType")}
           mb="md"
         />
 
@@ -126,19 +95,12 @@ export default function CreateHarvestPage() {
           label="Harvest Date"
           placeholder="MM-DD-YYYY"
           valueFormat="MM-DD-YYYY"
-          firstDayOfWeek={0} // Sunday
-          value={watch("harvestDate")}
-          onChange={(date) => setValue("harvestDate", date!)}
-          error={errors.harvestDate && "Required"}
+          {...form.getInputProps("harvestDate")}
           mb="md"
         />
 
         <Group justify="flex-end" mt="xl">
-          <Button
-            type="submit"
-            leftSection={<IconPlus size={16} />}
-            loading={submitting}
-          >
+          <Button type="submit" leftSection={<IconPlus size={16} />}>
             Add Harvest
           </Button>
         </Group>

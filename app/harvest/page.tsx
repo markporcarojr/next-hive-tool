@@ -5,17 +5,17 @@ import {
   Button,
   Card,
   Group,
+  Modal,
   Pagination,
   Stack,
   Text,
   Title,
-  Modal,
 } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-import { IconCheck, IconX } from "@tabler/icons-react";
+import { IconX } from "@tabler/icons-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useDisclosure } from "@mantine/hooks";
 
 const ITEMS_PER_PAGE = 4;
 
@@ -52,23 +52,17 @@ export default function HarvestPage() {
     });
 
     if (res.ok) {
-      notifications.show({
-        title: "Deleted",
-        message: "Your harvest record was removed.",
-        color: "teal",
-        icon: <IconCheck size={18} />,
-        autoClose: 3000,
-        withCloseButton: false,
-      });
+      setHarvests((prev) => prev.filter((h) => h.id !== harvestToDelete));
       close();
-      window.location.reload(); // You can use state instead later
+      setHarvestToDelete(null);
     } else {
       notifications.show({
         title: "Error",
-        message: "Could not delete harvest.",
+        message: "Failed to delete harvest record.",
         color: "red",
-        icon: <IconX size={18} />,
-        autoClose: 5000,
+        icon: <IconX size={20} />,
+        autoClose: 4000,
+        withCloseButton: true,
       });
     }
   };
@@ -124,7 +118,10 @@ export default function HarvestPage() {
       />
       <Modal
         opened={modalOpen}
-        onClose={close}
+        onClose={() => {
+          close();
+          setHarvestToDelete(null);
+        }}
         title="Confirm Deletion"
         centered
       >
