@@ -78,7 +78,6 @@ export default function CreateHarvestPage() {
       <form onSubmit={form.onSubmit(onSubmit)}>
         <NumberInput
           label="Harvest Amount (lbs)"
-          type="number"
           {...form.getInputProps("harvestAmount")}
           mb="md"
         />

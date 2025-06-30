@@ -15,12 +15,13 @@ datasource db {
 }
 
 model User {
-  id       Int       @id @default(autoincrement())
-  clerkId  String    @unique
-  email    String    @unique
-  name     String?
-  harvests Harvest[]
-  Hive     Hive[]
+  id         Int          @id @default(autoincrement())
+  clerkId    String       @unique
+  email      String       @unique
+  name       String?
+  harvests   Harvest[]
+  Hive       Hive[]
+  Inspection Inspection[]
 }
 
 model Harvest {
@@ -35,7 +36,7 @@ model Harvest {
 }
 
 model Hive {
-  id            Int      @id @default(autoincrement())
+  id            Int          @id @default(autoincrement())
   hiveDate      DateTime
   hiveNumber    Int
   hiveSource    String
@@ -50,7 +51,37 @@ model Hive {
   frames        Int?
   todo          String?
   userId        Int
-  user          User     @relation(fields: [userId], references: [id])
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  user          User         @relation(fields: [userId], references: [id])
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  Inspection    Inspection[]
+}
+
+model Inspection {
+  id               Int      @id @default(autoincrement())
+  hiveNumber       Int
+  temperament      String
+  hiveStrength     Int
+  inspectionDate   DateTime
+  inspectionImage  String? // optional
+  queen            String? // optional
+  queenCell        String? // optional
+  brood            String? // optional
+  disease          String? // optional
+  eggs             String? // optional
+  pests            String? // optional
+  feeding          String? // optional
+  treatments       String? // optional
+  inspectionNote   String? // optional
+  weatherCondition String? // optional
+  weatherTemp      String? // optional
+
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
+
+  hiveId Int
+  hive   Hive @relation(fields: [hiveId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
