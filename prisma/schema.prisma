@@ -63,11 +63,11 @@ model Inspection {
   hiveStrength     Int
   inspectionDate   DateTime
   inspectionImage  String? // optional
-  queen            String? // optional
-  queenCell        String? // optional
-  brood            String? // optional
-  disease          String? // optional
-  eggs             String? // optional
+  queen            Boolean? // optional
+  queenCell        Boolean? // optional
+  brood            Boolean? // optional
+  disease          Boolean? // optional
+  eggs             Boolean? // optional
   pests            String? // optional
   feeding          String? // optional
   treatments       String? // optional

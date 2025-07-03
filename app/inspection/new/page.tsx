@@ -3,22 +3,37 @@
 import { InspectionInput, inspectionSchema } from "@/lib/schemas/inspection";
 import {
   Button,
+  Checkbox,
   Container,
   Group,
-  NumberInput,
   Select,
+  Slider,
   Stack,
   TextInput,
   Textarea,
   Title,
+  Text,
+  Box,
 } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
-import { IconPlus } from "@tabler/icons-react";
+import { IconHeart, IconPlus } from "@tabler/icons-react";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+
+function getStrengthLabel(value: number) {
+  if (value < 35) return "Weak";
+  if (value < 70) return "Moderate";
+  return "Strong";
+}
+
+function getColor(value: number) {
+  if (value < 35) return "red";
+  if (value < 70) return "yellow";
+  return "green";
+}
 
 export default function CreateInspectionPage() {
   const router = useRouter();
@@ -63,13 +78,16 @@ export default function CreateInspectionPage() {
   });
 
   const handleSubmit = async (values: InspectionInput) => {
+    const parsed = {
+      ...values,
+      hiveId: Number(values.hiveId), // 👈 convert string to number
+    };
     try {
       const res = await fetch("/api/inspection", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          ...values,
-          inspectionDate: new Date(values.inspectionDate).toISOString(),
+          ...parsed,
         }),
       });
 
@@ -98,6 +116,7 @@ export default function CreateInspectionPage() {
       });
     }
   };
+  console.log("Hives array:", hives);
 
   return (
     <Container size="sm" mt="xl">
@@ -112,50 +131,100 @@ export default function CreateInspectionPage() {
             {...form.getInputProps("inspectionDate")}
             required
           />
-
           <Select
             label="Select Hive"
             placeholder="Choose a hive"
-            data={hives
-              .filter(
-                (hive): hive is { id: number; hiveNumber: number | null } =>
-                  typeof hive?.id === "number"
-              )
-              .map((hive) => ({
-                value: hive.id.toString(), // because form expects string
-                label: `Hive #${hive.hiveNumber ?? hive.id}`,
-              }))}
+            data={hives}
             {...form.getInputProps("hiveId")}
             required
           />
 
-          <TextInput
+          <Text fw={500} size="sm">
+            Hive Strength
+          </Text>
+          <Slider
+            label={` ${getStrengthLabel(form.values.hiveStrength)}`}
+            thumbChildren={<IconHeart size={16} />}
+            color={getColor(form.values.hiveStrength)}
+            thumbSize={26}
+            min={0}
+            max={100}
+            step={1}
+            value={form.values.hiveStrength}
+            onChange={(value) => form.setFieldValue("hiveStrength", value)}
+            styles={{ thumb: { borderWidth: 2, padding: 3 } }}
+          />
+
+          <Checkbox
+            label="Queen"
+            {...form.getInputProps("queen", { type: "checkbox" })}
+          />
+
+          <Checkbox
+            label="Queen Cell"
+            {...form.getInputProps("queenCell", { type: "checkbox" })}
+          />
+
+          <Checkbox
+            label="Brood"
+            {...form.getInputProps("brood", { type: "checkbox" })}
+          />
+
+          <Checkbox
+            label="Disease"
+            {...form.getInputProps("disease", { type: "checkbox" })}
+          />
+
+          <Checkbox
+            label="Eggs"
+            {...form.getInputProps("eggs", { type: "checkbox" })}
+          />
+
+          <Select
             label="Temperament"
+            placeholder="Pick value"
+            data={["Calm", "Aggressive", "Defensive", "Normal", "Other"]}
             {...form.getInputProps("temperament")}
-            required
           />
 
-          <NumberInput
-            label="Hive Strength"
-            {...form.getInputProps("hiveStrength")}
-            required
+          <Select
+            label="Pests"
+            placeholder="Pick value"
+            data={[
+              "Varroa Mites",
+              "Hive Beetles",
+              "Ants",
+              "Mice",
+              "Wax Moths",
+              "Other",
+            ]}
+            {...form.getInputProps("pests")}
           />
-
-          <TextInput label="Queen" {...form.getInputProps("queen")} />
-
-          <TextInput label="Queen Cell" {...form.getInputProps("queenCell")} />
-
-          <TextInput label="Brood" {...form.getInputProps("brood")} />
-
-          <TextInput label="Disease" {...form.getInputProps("disease")} />
-
-          <TextInput label="Eggs" {...form.getInputProps("eggs")} />
-
-          <TextInput label="Pests" {...form.getInputProps("pests")} />
-
-          <TextInput label="Feeding" {...form.getInputProps("feeding")} />
-
-          <TextInput label="Treatments" {...form.getInputProps("treatments")} />
+          <Select
+            label="Feeding"
+            placeholder="Pick value"
+            data={[
+              "Fondant",
+              "Pollen Patties",
+              "Sugar Syrup",
+              "No Feeding",
+              "Other",
+            ]}
+            {...form.getInputProps("feeding")}
+          />
+          <Select
+            label="Treatmnets"
+            placeholder="Pick value"
+            data={[
+              "Oxalic Acid",
+              "Formic Acid",
+              "Apivar",
+              "Diatomaceous Earth",
+              "No Treatments",
+              "Other",
+            ]}
+            {...form.getInputProps("treatments")}
+          />
 
           <Textarea label="Notes" {...form.getInputProps("inspectionNote")} />
 
