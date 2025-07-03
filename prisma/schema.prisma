@@ -38,7 +38,7 @@ model Harvest {
 model Hive {
   id            Int          @id @default(autoincrement())
   hiveDate      DateTime
-  hiveNumber    Int
+  hiveNumber    Int?
   hiveSource    String
   hiveImage     String?
   broodBoxes    Int?
@@ -54,12 +54,11 @@ model Hive {
   user          User         @relation(fields: [userId], references: [id])
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
-  Inspection    Inspection[]
+  inspections   Inspection[]
 }
 
 model Inspection {
   id               Int      @id @default(autoincrement())
-  hiveNumber       Int
   temperament      String
   hiveStrength     Int
   inspectionDate   DateTime

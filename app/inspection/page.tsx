@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Card,
   Title,
@@ -10,85 +10,79 @@ import {
   Pagination,
   Group,
   Divider,
+  Button,
 } from "@mantine/core";
-
-const inspections = [
-  {
-    id: 1,
-    hive: "Hive #1",
-    date: "2025-06-06",
-    notes: "Queen active, brood pattern strong.",
-    health: "Healthy",
-  },
-  {
-    id: 2,
-    hive: "Hive #2",
-    date: "2025-06-04",
-    notes: "Hive overcrowded, consider adding super.",
-    health: "Warning",
-  },
-  {
-    id: 3,
-    hive: "Hive #3",
-    date: "2025-06-01",
-    notes: "Signs of mites, beginning treatment.",
-    health: "Alert",
-  },
-  {
-    id: 4,
-    hive: "Hive #4",
-    date: "2025-05-30",
-    notes: "Queen not found, check again soon.",
-    health: "Warning",
-  },
-  {
-    id: 5,
-    hive: "Hive #5",
-    date: "2025-05-25",
-    notes: "Added new frames, bees drawing comb.",
-    health: "Healthy",
-  },
-];
+import Link from "next/link";
+import { InspectionInput } from "@/lib/schemas/inspection";
 
 const ITEMS_PER_PAGE = 4;
 
-function getBadgeColor(status: string) {
-  switch (status) {
-    case "Healthy":
-      return "green";
-    case "Warning":
-      return "yellow";
-    case "Alert":
-      return "red";
-    default:
-      return "gray";
-  }
-}
-
 export default function InspectionPage() {
+  const [inspections, setInspections] = useState<InspectionInput[]>([]);
   const [page, setPage] = useState(1);
 
   const start = (page - 1) * ITEMS_PER_PAGE;
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const res = await fetch("/api/inspection");
+      const data = await res.json();
+      setInspections(data);
+    };
+    fetchData();
+  }, []);
+
   const displayed = inspections.slice(start, start + ITEMS_PER_PAGE);
 
   return (
     <main style={{ padding: "2rem" }}>
-      <Title order={2} mb="md">
-        Inspection Logs
-      </Title>
+      <Group justify="space-between" mb="md">
+        <Title order={2}>Inspection Log</Title>
+        <Button
+          variant="filled"
+          color="#f4b400"
+          component={Link}
+          href="/inspection/new"
+        >
+          Add Inspection
+        </Button>
+      </Group>
 
       <Stack gap="md">
         {displayed.map((entry) => (
-          <Card key={entry.id} shadow="sm" padding="lg" radius="md" withBorder>
+          <Card
+            key={entry.inspectionDate + entry.hiveNumber}
+            shadow="sm"
+            padding="lg"
+            radius="md"
+            withBorder
+          >
             <Group justify="space-between">
-              <Title order={4}>{entry.hive}</Title>
-              <Badge color={getBadgeColor(entry.health)}>{entry.health}</Badge>
+              <Title order={4}>Hive #{entry.hiveNumber}</Title>
+              <Badge>
+                {new Date(entry.inspectionDate).toLocaleDateString()}
+              </Badge>
             </Group>
             <Text size="sm" c="dimmed">
-              {entry.date}
+              Temperament: {entry.temperament}
+            </Text>
+            <Text size="sm" c="dimmed">
+              Hive Strength: {entry.hiveStrength}
+            </Text>
+            <Text size="sm" mt="xs">
+              Notes: {entry.inspectionNote || "No notes provided"}
             </Text>
             <Divider my="sm" />
-            <Text>{entry.notes}</Text>
+            <Group justify="flex-end">
+              <Button
+                size="xs"
+                variant="light"
+                component={Link}
+                href={`/inspection/edit/${entry.id}`}
+              >
+                Edit
+              </Button>
+            </Group>
           </Card>
         ))}
       </Stack>

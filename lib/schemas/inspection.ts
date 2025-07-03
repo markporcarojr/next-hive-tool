@@ -1,12 +1,11 @@
 import { z } from "zod";
 
 export const inspectionSchema = z.object({
-  hiveNumber: z.number().min(1),
+  hiveId: z.coerce.number().int().min(1),
   temperament: z.string().min(1),
-  hiveStrength: z.number().min(1),
+  hiveStrength: z.number().int().min(0),
   inspectionDate: z.coerce.date(),
-
-  inspectionImage: z.string().url().optional().or(z.literal("")),
+  inspectionImage: z.string().optional(),
   queen: z.string().optional(),
   queenCell: z.string().optional(),
   brood: z.string().optional(),
@@ -18,9 +17,6 @@ export const inspectionSchema = z.object({
   inspectionNote: z.string().optional(),
   weatherCondition: z.string().optional(),
   weatherTemp: z.string().optional(),
-
-  userId: z.number().optional(), // will be injected from auth context
-  hiveId: z.number().min(1),
 });
 
 export type InspectionInput = z.infer<typeof inspectionSchema>;
