@@ -1,24 +1,25 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { InspectionWithHive } from "@/lib/schemas/inspection";
 import {
-  Card,
-  Title,
-  Text,
-  Stack,
   Badge,
-  Pagination,
-  Group,
-  Divider,
   Button,
+  Card,
+  Divider,
+  Group,
+  Pagination,
+  Stack,
+  Text,
+  Title,
 } from "@mantine/core";
 import Link from "next/link";
-import { InspectionInput } from "@/lib/schemas/inspection";
+import { useEffect, useState } from "react";
 
 const ITEMS_PER_PAGE = 4;
 
 export default function InspectionPage() {
-  const [inspections, setInspections] = useState<InspectionInput[]>([]);
+  const [inspections, setInspections] = useState<InspectionWithHive[]>([]);
+
   const [page, setPage] = useState(1);
 
   const start = (page - 1) * ITEMS_PER_PAGE;
@@ -51,14 +52,14 @@ export default function InspectionPage() {
       <Stack gap="md">
         {displayed.map((entry) => (
           <Card
-            key={entry.inspectionDate + entry.hiveNumber}
+            key={entry.hiveId}
             shadow="sm"
             padding="lg"
             radius="md"
             withBorder
           >
             <Group justify="space-between">
-              <Title order={4}>Hive #{entry.hiveNumber}</Title>
+              <Title order={4}>Hive #{entry.hive.hiveNumber}</Title>
               <Badge>
                 {new Date(entry.inspectionDate).toLocaleDateString()}
               </Badge>

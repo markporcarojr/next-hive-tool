@@ -18,6 +18,9 @@ export async function GET(req: NextRequest) {
     const inspections = await prisma.inspection.findMany({
       where: { userId: user.id },
       orderBy: { inspectionDate: "desc" },
+      include: {
+        hive: true, // 👈 This gives you hive.hiveNumber
+      },
     });
 
     return NextResponse.json(inspections);

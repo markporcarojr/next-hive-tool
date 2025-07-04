@@ -9,11 +9,10 @@ import {
   Select,
   Slider,
   Stack,
+  Text,
   TextInput,
   Textarea,
   Title,
-  Text,
-  Box,
 } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
@@ -37,9 +36,7 @@ function getColor(value: number) {
 
 export default function CreateInspectionPage() {
   const router = useRouter();
-  const [hives, setHives] = useState<
-    { id: number; hiveNumber: number | null }[]
-  >([]);
+  const [hives, setHives] = useState<{ value: string; label: string }[]>([]);
 
   useEffect(() => {
     const fetchHives = async () => {
@@ -57,16 +54,17 @@ export default function CreateInspectionPage() {
 
   const form = useForm<InspectionInput>({
     initialValues: {
+      id: 0,
       temperament: "",
       hiveStrength: 0,
       hiveId: 0,
       inspectionDate: new Date(),
       inspectionImage: "",
-      queen: "",
-      queenCell: "",
-      brood: "",
-      disease: "",
-      eggs: "",
+      queen: undefined,
+      queenCell: undefined,
+      brood: undefined,
+      disease: undefined,
+      eggs: undefined,
       pests: "",
       feeding: "",
       treatments: "",

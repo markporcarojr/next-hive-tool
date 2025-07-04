@@ -1,19 +1,20 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { HarvestInput, harvestSchema } from "@/lib/schemas/harvest";
 import {
   Button,
   Container,
   Group,
+  NumberInput,
   Select,
-  TextInput,
   Title,
 } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
-import { useForm, zodResolver } from "@mantine/form";
-import { useRouter } from "next/navigation";
+import { useForm } from "@mantine/form";
+import { zodResolver } from "mantine-form-zod-resolver";
 import { notifications } from "@mantine/notifications";
-import { HarvestInput, harvestSchema } from "@/lib/schemas/harvest";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function EditHarvestPage({
   params,
@@ -104,9 +105,8 @@ export default function EditHarvestPage({
         Edit Harvest
       </Title>
       <form onSubmit={form.onSubmit(handleSubmit)}>
-        <TextInput
+        <NumberInput
           label="Harvest Amount (lbs)"
-          type="number"
           {...form.getInputProps("harvestAmount")}
           mb="md"
         />

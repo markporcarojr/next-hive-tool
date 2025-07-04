@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 export const inspectionSchema = z.object({
+  id: z.number().int().min(0),
   hiveId: z.coerce.number().int().min(1),
   temperament: z.string().min(1),
   hiveStrength: z.number().int().min(0),
@@ -20,3 +21,8 @@ export const inspectionSchema = z.object({
 });
 
 export type InspectionInput = z.infer<typeof inspectionSchema>;
+export type InspectionWithHive = InspectionInput & {
+  hive: {
+    hiveNumber: number;
+  };
+};
