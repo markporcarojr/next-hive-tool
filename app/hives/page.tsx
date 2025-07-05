@@ -1,24 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  Card,
-  Title,
-  Text,
-  Stack,
-  Divider,
-  Button,
-  Pagination,
-  Group,
-} from "@mantine/core";
+import { Card, Title, Text, Divider, Button, Group } from "@mantine/core";
 import Link from "next/link";
 import { HiveInput } from "@/lib/schemas/hive";
-
-const ITEMS_PER_PAGE = 4;
+import { PaginatedList } from "../components/PaginatedList";
 
 export default function HivePage() {
   const [hives, setHives] = useState<HiveInput[]>([]);
-  const [activePage, setPage] = useState(1);
+
   useEffect(() => {
     const fetchData = async () => {
       const res = await fetch("/api/hives");
@@ -27,9 +17,6 @@ export default function HivePage() {
     };
     fetchData();
   }, []);
-
-  const startIndex = (activePage - 1) * ITEMS_PER_PAGE;
-  const displayedHives = hives.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
   return (
     <main style={{ padding: "2rem" }}>
@@ -45,8 +32,10 @@ export default function HivePage() {
         </Button>
       </Group>
 
-      <Stack gap="md">
-        {displayedHives.map((hive) => (
+      <PaginatedList
+        data={hives}
+        itemsPerPage={4}
+        renderItem={(hive) => (
           <Card
             key={hive.hiveNumber}
             shadow="sm"
@@ -63,15 +52,7 @@ export default function HivePage() {
               View Details
             </Button>
           </Card>
-        ))}
-      </Stack>
-
-      <Pagination
-        mt="xl"
-        total={Math.ceil(hives.length / ITEMS_PER_PAGE)}
-        value={activePage}
-        onChange={setPage}
-        color="honey"
+        )}
       />
     </main>
   );

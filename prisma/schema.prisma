@@ -22,6 +22,7 @@ model User {
   harvests   Harvest[]
   Hive       Hive[]
   Inspection Inspection[]
+  SwarmTrap  SwarmTrap[]
 }
 
 model Harvest {
@@ -36,25 +37,29 @@ model Harvest {
 }
 
 model Hive {
-  id            Int          @id @default(autoincrement())
-  hiveDate      DateTime
-  hiveNumber    Int?
-  hiveSource    String
-  hiveImage     String?
-  broodBoxes    Int?
-  superBoxes    Int?
-  hiveStrength  Int?
-  queenColor    String?
-  queenAge      String?
-  queenExcluder String?
-  breed         String?
-  frames        Int?
-  todo          String?
-  userId        Int
-  user          User         @relation(fields: [userId], references: [id])
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @updatedAt
-  inspections   Inspection[]
+  id               Int          @id @default(autoincrement())
+  hiveDate         DateTime
+  hiveNumber       Int?
+  hiveSource       String
+  hiveImage        String?
+  broodBoxes       Int?
+  superBoxes       Int?
+  hiveStrength     Int?
+  queenColor       String?
+  queenAge         String?
+  queenExcluder    String?
+  breed            String?
+  frames           Int?
+  todo             String?
+  userId           Int
+  user             User         @relation(fields: [userId], references: [id])
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+  inspections      Inspection[]
+  isFromSwarmTrap  Boolean      @default(false)
+  swarmCaptureDate DateTime?
+  swarmTrapId      Int? // Optional link to trap
+  swarmTrap        SwarmTrap?   @relation(fields: [swarmTrapId], references: [id])
 }
 
 model Inspection {
@@ -80,6 +85,22 @@ model Inspection {
 
   hiveId Int
   hive   Hive @relation(fields: [hiveId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model SwarmTrap {
+  id          Int       @id @default(autoincrement())
+  location    String // general description
+  latitude    Float // required for map
+  longitude   Float // required for map
+  notes       String?
+  installedAt DateTime
+  removedAt   DateTime?
+  userId      Int
+  user        User      @relation(fields: [userId], references: [id])
+  hives       Hive[] // Linked hives that came from this trap
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

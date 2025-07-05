@@ -51,13 +51,7 @@ export default function InspectionPage() {
 
       <Stack gap="md">
         {displayed.map((entry) => (
-          <Card
-            key={entry.hiveId}
-            shadow="sm"
-            padding="lg"
-            radius="md"
-            withBorder
-          >
+          <Card key={entry.id} shadow="sm" padding="lg" radius="md" withBorder>
             <Group justify="space-between">
               <Title order={4}>Hive #{entry.hive.hiveNumber}</Title>
               <Badge>
