@@ -7,11 +7,15 @@ import {
   Card,
   Divider,
   Group,
+  Modal,
   Pagination,
   Stack,
   Text,
   Title,
 } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
+import { notifications } from "@mantine/notifications";
+import { IconX } from "@tabler/icons-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -19,7 +23,10 @@ const ITEMS_PER_PAGE = 4;
 
 export default function InspectionPage() {
   const [inspections, setInspections] = useState<InspectionWithHive[]>([]);
-
+  const [inspectionToDelete, setInspectionToDelete] = useState<number | null>(
+    null
+  );
+  const [modalOpen, { open, close }] = useDisclosure(false);
   const [page, setPage] = useState(1);
 
   const start = (page - 1) * ITEMS_PER_PAGE;
@@ -32,6 +39,29 @@ export default function InspectionPage() {
     };
     fetchData();
   }, []);
+
+  const handleDelete = async () => {
+    if (!inspectionToDelete) return;
+
+    const res = await fetch(`/api/inspection?id=${inspectionToDelete}`, {
+      method: "DELETE",
+    });
+
+    if (res.ok) {
+      setInspections((prev) => prev.filter((h) => h.id !== inspectionToDelete));
+      close();
+      setInspectionToDelete(null);
+    } else {
+      notifications.show({
+        title: "Error",
+        message: "Failed to delete inspection record.",
+        color: "red",
+        icon: <IconX size={20} />,
+        autoClose: 4000,
+        withCloseButton: true,
+      });
+    }
+  };
 
   const displayed = inspections.slice(start, start + ITEMS_PER_PAGE);
 
@@ -68,7 +98,7 @@ export default function InspectionPage() {
               Notes: {entry.inspectionNote || "No notes provided"}
             </Text>
             <Divider my="sm" />
-            <Group justify="flex-end">
+            <Group justify="space-between">
               <Button
                 size="xs"
                 variant="light"
@@ -76,6 +106,17 @@ export default function InspectionPage() {
                 href={`/inspection/edit/${entry.id}`}
               >
                 Edit
+              </Button>
+              <Button
+                color="red"
+                variant="light"
+                size="xs"
+                onClick={() => {
+                  setInspectionToDelete(entry.id!);
+                  open();
+                }}
+              >
+                Delete
               </Button>
             </Group>
           </Card>
@@ -89,6 +130,25 @@ export default function InspectionPage() {
         onChange={setPage}
         color="honey"
       />
+      <Modal
+        opened={modalOpen}
+        onClose={() => {
+          close();
+          setInspectionToDelete(null);
+        }}
+        title="Confirm Deletion"
+        centered
+      >
+        <Text mb="md">Are you sure you want to delete this record?</Text>
+        <Group justify="flex-end">
+          <Button variant="default" onClick={close}>
+            Cancel
+          </Button>
+          <Button color="red" onClick={handleDelete}>
+            Confirm Delete
+          </Button>
+        </Group>
+      </Modal>
     </main>
   );
 }

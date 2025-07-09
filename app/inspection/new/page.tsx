@@ -54,7 +54,6 @@ export default function CreateInspectionPage() {
 
   const form = useForm<InspectionInput>({
     initialValues: {
-      id: 0,
       temperament: "",
       hiveStrength: 0,
       hiveId: 0,

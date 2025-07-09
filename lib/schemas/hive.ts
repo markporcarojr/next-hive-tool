@@ -2,6 +2,7 @@
 import { z } from "zod";
 
 export const hiveSchema = z.object({
+  id: z.number().int().optional(), // optional for new hives
   hiveDate: z.coerce.date(), // ensures a real Date object
   hiveNumber: z.number().int().min(1, "Hive number is required"),
   hiveSource: z.string().min(1, "Hive source is required"),

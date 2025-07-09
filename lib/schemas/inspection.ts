@@ -1,7 +1,8 @@
 import { z } from "zod";
+import { id } from "zod/v4/locales";
 
 export const inspectionSchema = z.object({
-  id: z.number().int().min(0),
+  id: z.coerce.number().int().optional(),
   hiveId: z.coerce.number().int().min(1),
   temperament: z.string().min(1),
   hiveStrength: z.number().int().min(0),

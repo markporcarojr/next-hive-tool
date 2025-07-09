@@ -84,7 +84,7 @@ export default function SwarmPage() {
       <Title order={2} mb="md">
         Swarm Traps
       </Title>
-      <TrapMap />
+      {/* <TrapMap /> */}
       <Stack gap="md">
         {displayed.map((swarm) => (
           <Card key={swarm.id} shadow="sm" padding="lg" radius="md" withBorder>

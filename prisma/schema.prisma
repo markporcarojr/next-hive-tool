@@ -84,7 +84,7 @@ model Inspection {
   user   User @relation(fields: [userId], references: [id])
 
   hiveId Int
-  hive   Hive @relation(fields: [hiveId], references: [id])
+  hive   Hive @relation(fields: [hiveId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -1,5 +1,6 @@
 "use client";
 
+import { HarvestInput } from "@/lib/schemas/harvest";
 import {
   Badge,
   Button,
@@ -19,15 +20,8 @@ import { useEffect, useState } from "react";
 
 const ITEMS_PER_PAGE = 4;
 
-type Harvest = {
-  id: number;
-  harvestType: string;
-  harvestAmount: number;
-  harvestDate: string;
-};
-
 export default function HarvestPage() {
-  const [harvests, setHarvests] = useState<Harvest[]>([]);
+  const [harvests, setHarvests] = useState<HarvestInput[]>([]);
   const [activePage, setPage] = useState(1);
   const [modalOpen, { open, close }] = useDisclosure(false);
   const [harvestToDelete, setHarvestToDelete] = useState<number | null>(null);
@@ -44,6 +38,7 @@ export default function HarvestPage() {
 
   const startIndex = (activePage - 1) * ITEMS_PER_PAGE;
   const displayed = harvests.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
   const handleDelete = async () => {
     if (!harvestToDelete) return;
 
@@ -71,7 +66,12 @@ export default function HarvestPage() {
     <main style={{ padding: "2rem" }}>
       <Group justify="space-between" mb="md">
         <Title order={2}>Your Harvests</Title>
-        <Button component={Link} href="/harvest/new">
+        <Button
+          variant="filled"
+          color="#f4b400"
+          component={Link}
+          href="/harvest/new"
+        >
           Add Harvest
         </Button>
       </Group>
@@ -97,7 +97,7 @@ export default function HarvestPage() {
                 variant="light"
                 size="xs"
                 onClick={() => {
-                  setHarvestToDelete(entry.id);
+                  setHarvestToDelete(entry.id!);
                   open();
                 }}
               >

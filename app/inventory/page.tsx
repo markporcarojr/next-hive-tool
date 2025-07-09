@@ -5,6 +5,7 @@ import {
   Box,
   Button,
   Container,
+  Divider,
   Group,
   Modal,
   Stack,
@@ -75,40 +76,43 @@ export default function InventoryPage() {
         </Button>
       </Group>
 
-      <Box component="section" mt="lg">
+      <Box component="section" mt="sm">
         {inventory.length > 0 ? (
           <Stack spacing="sm">
             {inventory.map((item) => (
-              <Box
-                key={item.id}
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                  padding: "0.5rem 0.75rem",
-                  borderRadius: "8px",
-                  transition: "background 0.2s ease",
-                }}
-                onMouseEnter={(e) =>
-                  (e.currentTarget.style.background = "rgba(255,255,255,0.03)")
-                }
-                onMouseLeave={(e) =>
-                  (e.currentTarget.style.background = "transparent")
-                }
-              >
-                <Group gap="xs">
-                  <Text fw={600}>{item.name}</Text>
-                  <Text c="dimmed">({item.count})</Text>
-                </Group>
-
-                <ActionIcon
-                  variant="light"
-                  color="red"
-                  onClick={() => handleDelete(item.id)}
-                  aria-label={`Delete ${item.name}`}
+              <Box key={item.id}>
+                <Box
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    padding: "0.5rem 0.75rem",
+                    borderRadius: "8px",
+                    transition: "background 0.2s ease",
+                  }}
+                  onMouseEnter={(e) =>
+                    (e.currentTarget.style.background =
+                      "rgba(255,255,255,0.03)")
+                  }
+                  onMouseLeave={(e) =>
+                    (e.currentTarget.style.background = "transparent")
+                  }
                 >
-                  <IconTrash size={18} />
-                </ActionIcon>
+                  <Group gap="xs">
+                    <Text fw={600}>{item.name}</Text>
+                    <Text c="dimmed">({item.count})</Text>
+                  </Group>
+                  <ActionIcon
+                    variant="light"
+                    color="red"
+                    onClick={() => handleDelete(item.id)}
+                    aria-label={`Delete ${item.name}`}
+                  >
+                    <IconTrash size={18} />
+                  </ActionIcon>
+                </Box>
+
+                <Divider my="sm" />
               </Box>
             ))}
           </Stack>

@@ -1,29 +1,27 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { HiveInput, hiveSchema } from "@/lib/schemas/hive";
 import {
   Button,
   Container,
   Group,
   NumberInput,
   Select,
+  Stack,
   TextInput,
   Textarea,
   Title,
-  Stack,
 } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
-import { useRouter, useSearchParams } from "next/navigation";
 import { notifications } from "@mantine/notifications";
 import { IconEdit } from "@tabler/icons-react";
-import { HiveInput, hiveSchema } from "@/lib/schemas/hive";
 import { zodResolver } from "mantine-form-zod-resolver";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
-export default function EditHivePage() {
+export default function EditHivesPage({ params }: { params: { id: string } }) {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const id = searchParams.get("id");
   const [loading, setLoading] = useState(false);
 
   const form = useForm<HiveInput>({
@@ -40,22 +38,41 @@ export default function EditHivePage() {
   });
 
   useEffect(() => {
-    const fetchHive = async () => {
-      if (!id) return;
-      const res = await fetch(`/api/hives?id=${id}`);
-      const data = await res.json();
-      form.setValues({
-        ...data,
-        hiveDate: new Date(data.hiveDate),
-      });
+    const fetchData = async () => {
+      try {
+        const res = await fetch("/api/hives");
+        const data = await res.json();
+        const current = data.find((h: any) => h.id === Number(params.id));
+        if (!current) return router.push("/hives");
+
+        form.setValues({
+          hiveNumber: current.hiveNumber,
+          hiveSource: current.hiveSource,
+          hiveDate: new Date(current.hiveDate),
+          queenColor: current.queenColor || "",
+          broodBoxes: current.broodBoxes || 0,
+          superBoxes: current.superBoxes || 0,
+          todo: current.todo || "",
+        });
+      } catch (e) {
+        notifications.show({
+          title: "Error",
+          message: "Failed to load data",
+          color: "red",
+        });
+        router.push("/hives");
+      } finally {
+        setLoading(false);
+      }
     };
-    fetchHive();
-  }, [id]);
+
+    fetchData();
+  }, [params.id]);
 
   const handleSubmit = async (values: HiveInput) => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/hives?id=${id}`, {
+      const res = await fetch(`/api/hives?id=${params.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
