@@ -1,17 +1,18 @@
 "use client";
 
-import { useForm, zodResolver } from "@mantine/form";
+import { SwarmInput, swarmTrapSchema } from "@/lib/schemas/swarmTrap";
 import {
+  Button,
+  Group,
+  NumberInput,
+  Stack,
   TextInput,
   Textarea,
-  NumberInput,
-  Button,
-  Stack,
-  Group,
   Title,
 } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
-import { swarmTrapSchema, SwarmInput } from "@/lib/schemas/swarmTrap";
+import { useForm } from "@mantine/form";
+import { zodResolver } from "mantine-form-zod-resolver";
 import { useRouter } from "next/navigation";
 
 export default function SwarmForm() {
