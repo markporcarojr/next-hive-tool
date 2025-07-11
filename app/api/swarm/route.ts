@@ -3,7 +3,7 @@ import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { swarmTrapSchema } from "@/lib/schemas/swarmTrap";
 
-// GET: /api/hives
+// GET: /api/swarm
 export async function GET(req: NextRequest) {
   const { userId: clerkId } = await auth();
   if (!clerkId)
@@ -14,19 +14,19 @@ export async function GET(req: NextRequest) {
     if (!user)
       return NextResponse.json({ error: "User not found" }, { status: 404 });
 
-    const hives = await prisma.swarm.findMany({
+    const hives = await prisma.swarmTrap.findMany({
       where: { userId: user.id },
-      orderBy: { hiveDate: "desc" },
+      orderBy: { installedAt: "desc" },
     });
 
     return NextResponse.json(hives);
   } catch (error) {
-    console.error("[HIVES_GET]", error);
+    console.error("[SWARMS_GET]", error);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
 
-// POST: /api/hives
+// POST: /api/swarm
 export async function POST(req: NextRequest) {
   const { userId: clerkId } = await auth();
 
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
-  const parsed = hiveSchema.safeParse(body);
+  const parsed = swarmTrapSchema.safeParse(body);
 
   if (!parsed.success) {
     return NextResponse.json(
@@ -55,36 +55,23 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "User not found" }, { status: 404 });
     }
 
-    const existingHive = await prisma.hive.findFirst({
-      where: {
-        hiveNumber: data.hiveNumber,
-        userId: user.id,
-      },
-    });
-
-    if (existingHive) {
-      return NextResponse.json(
-        { message: `Hive number ${data.hiveNumber} already exists.` },
-        { status: 409 }
-      );
-    }
-
-    const hive = await prisma.hive.create({
+    const swarmTrap = await prisma.swarmTrap.create({
       data: {
         ...data,
-        hiveDate: new Date(data.hiveDate),
+        installedAt: new Date(data.installedAt),
+        removedAt: data.removedAt ? new Date(data.removedAt) : null,
         userId: user.id,
       },
     });
 
-    return NextResponse.json(hive, { status: 201 });
+    return NextResponse.json(swarmTrap, { status: 201 });
   } catch (error) {
-    console.error("[HIVE_POST]", error);
+    console.error("[SWARM_POST]", error);
     return NextResponse.json({ message: "Server error" }, { status: 500 });
   }
 }
 
-// DELETE: /api/hives?id=123
+// DELETE: /api/swarm?id=123
 export async function DELETE(req: NextRequest) {
   const { userId: clerkId } = await auth();
   if (!clerkId)
@@ -101,7 +88,7 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ message: "Invalid ID" }, { status: 400 });
     }
 
-    const result = await prisma.hive.deleteMany({
+    const result = await prisma.swarmTrap.deleteMany({
       where: {
         id: Number(id),
         userId: user.id,
@@ -109,10 +96,10 @@ export async function DELETE(req: NextRequest) {
     });
 
     if (result.count === 0) {
-      return NextResponse.json({ message: "Hive not found" }, { status: 404 });
+      return NextResponse.json({ message: "Swarm not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ message: "Hive deleted" });
+    return NextResponse.json({ message: "Swarm deleted" });
   } catch (error) {
     console.error("[HIVES_DELETE]", error);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
@@ -137,7 +124,7 @@ export async function PATCH(req: NextRequest) {
     }
 
     const body = await req.json();
-    const parsed = hiveSchema.safeParse(body);
+    const parsed = swarmTrapSchema.safeParse(body);
 
     if (!parsed.success) {
       return NextResponse.json(
@@ -146,7 +133,7 @@ export async function PATCH(req: NextRequest) {
       );
     }
 
-    const updated = await prisma.hive.updateMany({
+    const updated = await prisma.swarmTrap.updateMany({
       where: { id: Number(id), userId: user.id },
       data: {
         ...parsed.data,
@@ -155,12 +142,12 @@ export async function PATCH(req: NextRequest) {
     });
 
     if (updated.count === 0) {
-      return NextResponse.json({ message: "Hive not found" }, { status: 404 });
+      return NextResponse.json({ message: "Swarm not found" }, { status: 404 });
     }
 
-    return NextResponse.json({ message: "Hive updated" });
+    return NextResponse.json({ message: "Swarm updated" });
   } catch (error) {
-    console.error("[HIVES_PATCH]", error);
+    console.error("SWARM_PATCH]", error);
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
