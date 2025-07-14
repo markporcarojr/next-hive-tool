@@ -157,6 +157,7 @@ export default function EditHivesPage({ params }: { params: { id: string } }) {
               type="submit"
               leftSection={<IconEdit size={16} />}
               loading={loading}
+              color="yellow"
             >
               Update Hive
             </Button>

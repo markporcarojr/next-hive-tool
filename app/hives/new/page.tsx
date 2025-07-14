@@ -14,6 +14,7 @@ import {
 import { DateInput } from "@mantine/dates";
 import "@mantine/dates/styles.css";
 import { useForm } from "@mantine/form";
+import { notifications } from "@mantine/notifications";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -50,15 +51,29 @@ export default function NewHivePage() {
         body: JSON.stringify(values),
       });
 
-      if (res.ok) {
-        router.push("/hives");
-      } else {
+      if (!res.ok) {
         const errorData = await res.json();
-        alert(errorData.message || "Error saving hive");
+        notifications.show({
+          title: "Error",
+          message: errorData.message || "Failed to save hive",
+          color: "red",
+        });
+        return;
+      } else {
+        notifications.show({
+          title: "Success",
+          message: "Hive saved successfully",
+          color: "green",
+        });
+        router.push("/hives");
       }
     } catch (error) {
-      console.error("Submission error:", error);
-      alert("An unexpected error occurred.");
+      notifications.show({
+        title: "Error",
+        message: "Failed to save hive",
+        color: "red",
+      });
+      console.error("Failed to save hive:", error);
     } finally {
       setLoading(false);
     }
@@ -133,7 +148,7 @@ export default function NewHivePage() {
             {...form.getInputProps("todo")}
           />
           <Group justify="flex-end">
-            <Button type="submit" loading={loading}>
+            <Button type="submit" loading={loading} color="yellow">
               Save Hive
             </Button>
           </Group>
