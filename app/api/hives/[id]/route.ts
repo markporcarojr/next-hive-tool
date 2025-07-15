@@ -58,24 +58,3 @@ export async function PATCH(
     return NextResponse.json({ message: "Server error" }, { status: 500 });
   }
 }
-
-// DELETE /api/hives/[id]
-export async function DELETE(
-  _: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const { userId: clerkId } = await auth();
-  if (!clerkId)
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-
-  try {
-    await prisma.hive.delete({
-      where: { id: Number(params.id) },
-    });
-
-    return NextResponse.json({ message: "Hive deleted" });
-  } catch (error) {
-    console.error("[HIVE_DELETE_BY_ID]", error);
-    return NextResponse.json({ message: "Server error" }, { status: 500 });
-  }
-}

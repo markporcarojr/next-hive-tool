@@ -38,7 +38,7 @@ export default function EditSwarmPage({ params }: { params: { id: string } }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch(`/api/swarm/${params.id}`);
+        const res = await fetch(`/api/swarm/edit/${params.id}`);
         if (!res.ok) throw new Error("Failed to fetch swarm data");
 
         const data = await res.json();

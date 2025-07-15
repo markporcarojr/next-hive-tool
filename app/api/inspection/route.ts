@@ -71,3 +71,41 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: "Server error" }, { status: 500 });
   }
 }
+
+// DELETE: /api/inspections?id=123
+export async function DELETE(req: NextRequest) {
+  const { userId: clerkId } = await auth();
+  try {
+    if (!clerkId)
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+
+    const user = await prisma.user.findUnique({ where: { clerkId } });
+    if (!user)
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
+
+    const url = new URL(req.url);
+    const id = url.searchParams.get("id");
+    if (!id || isNaN(Number(id))) {
+      return NextResponse.json({ message: "Invalid ID" }, { status: 400 });
+    }
+
+    const result = await prisma.inspection.deleteMany({
+      where: {
+        id: Number(id),
+        userId: user.id,
+      },
+    });
+
+    if (result.count === 0) {
+      return NextResponse.json(
+        { message: "Inspection not found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({ message: "Inspection deleted" });
+  } catch (error) {
+    console.error("[HIVE_ERROR]", error);
+    return NextResponse.json({ message: "Server error" }, { status: 500 });
+  }
+}

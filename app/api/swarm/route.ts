@@ -71,4 +71,36 @@ export async function POST(req: NextRequest) {
   }
 }
 
-// DELETE: /api/swarm?id=123
+export async function DELETE(req: NextRequest) {
+  const { userId: clerkId } = await auth();
+  if (!clerkId)
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+
+  try {
+    const user = await prisma.user.findUnique({ where: { clerkId } });
+    if (!user)
+      return NextResponse.json({ message: "User not found" }, { status: 404 });
+
+    const url = new URL(req.url);
+    const id = url.searchParams.get("id");
+    if (!id || isNaN(Number(id))) {
+      return NextResponse.json({ message: "Invalid ID" }, { status: 400 });
+    }
+
+    const result = await prisma.swarmTrap.deleteMany({
+      where: {
+        id: Number(id),
+        userId: user.id,
+      },
+    });
+
+    if (result.count === 0) {
+      return NextResponse.json({ message: "Swarm not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({ message: "Swarm deleted" });
+  } catch (error) {
+    console.error("[SWARM_DELETE]", error);
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
+  }
+}

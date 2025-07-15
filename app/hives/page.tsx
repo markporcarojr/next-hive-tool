@@ -1,7 +1,15 @@
 "use client";
 
 import { HiveInput } from "@/lib/schemas/hive";
-import { Button, Card, Divider, Modal, Text, Title } from "@mantine/core";
+import {
+  Button,
+  Card,
+  Divider,
+  Group,
+  Modal,
+  Text,
+  Title,
+} from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { IconX } from "@tabler/icons-react";

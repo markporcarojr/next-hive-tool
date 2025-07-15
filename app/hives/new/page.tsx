@@ -18,6 +18,7 @@ import { notifications } from "@mantine/notifications";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { fa } from "zod/v4/locales";
 
 export default function NewHivePage() {
   const router = useRouter();
@@ -101,6 +102,8 @@ export default function NewHivePage() {
           />
           <TextInput
             label="Hive Image URL"
+            placeholder="Optional image URL"
+            error={false}
             {...form.getInputProps("hiveImage")}
           />
           <NumberInput
