@@ -1,11 +1,11 @@
 "use client";
 
+import MapPicker from "@/app/components/MapPicker";
 import { SwarmInput, swarmTrapSchema } from "@/lib/schemas/swarmTrap";
 import {
   Button,
   Container,
   Group,
-  NumberInput,
   Stack,
   TextInput,
   Textarea,
@@ -25,7 +25,7 @@ export default function NewSwarmPage() {
 
   const form = useForm<SwarmInput>({
     initialValues: {
-      location: "",
+      label: "",
       latitude: 42.78,
       longitude: -83.77,
       installedAt: new Date(),
@@ -75,30 +75,19 @@ export default function NewSwarmPage() {
   return (
     <Container size="sm" mt="xl">
       <Title order={2} mb="lg">
-        Edit Hive
+        Add New Swarm Trap
       </Title>
       <form onSubmit={form.onSubmit(onSubmit)}>
         <Stack>
-          <TextInput
-            label="Location"
-            required
-            {...form.getInputProps("location")}
-          />
+          <TextInput label="Label" required {...form.getInputProps("label")} />
 
-          <NumberInput
-            label="Latitude"
-            min={-90}
-            max={90}
-            required
-            {...form.getInputProps("latitude")}
-          />
-
-          <NumberInput
-            label="Longitude"
-            min={-180}
-            max={180}
-            required
-            {...form.getInputProps("longitude")}
+          <MapPicker
+            initialLat={form.values.latitude}
+            initialLng={form.values.longitude}
+            onSelect={(lat, lng) => {
+              form.setFieldValue("latitude", lat);
+              form.setFieldValue("longitude", lng);
+            }}
           />
 
           <DateInput

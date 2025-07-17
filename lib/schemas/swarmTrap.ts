@@ -8,7 +8,7 @@ export const swarmTrapSchema = z.object({
   latitude: z.number().min(-90).max(90),
   longitude: z.number().min(-180).max(180),
   notes: z.string().max(500).optional(),
-  location: z.string().max(100),
+  label: z.string().max(100),
 });
 
 export type SwarmInput = z.infer<typeof swarmTrapSchema>;

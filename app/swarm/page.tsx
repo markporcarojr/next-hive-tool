@@ -83,7 +83,7 @@ export default function SwarmPage() {
             </Group>
 
             <Text size="sm" c="dimmed">
-              Location: {trap.location}
+              Label {trap.label}
             </Text>
 
             <Text size="sm" c="dimmed">

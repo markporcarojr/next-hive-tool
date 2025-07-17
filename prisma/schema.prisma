@@ -104,7 +104,7 @@ model Inventory {
 
 model SwarmTrap {
   id          Int       @id @default(autoincrement())
-  location    String // general description
+  label       String // general description
   latitude    Float // required for map
   longitude   Float // required for map
   notes       String?

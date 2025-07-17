@@ -1,11 +1,13 @@
 // app/test-map/page.tsx
 "use client";
 
-import { useEffect, useState } from "react";
-import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { SwarmInput } from "@/lib/schemas/swarmTrap";
 import { Card, Title } from "@mantine/core";
-import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+import { useEffect, useState } from "react";
+import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
+import { set } from "zod";
 
 // Use an orange marker icon
 const orangeIcon = new L.Icon({
@@ -18,108 +20,21 @@ const orangeIcon = new L.Icon({
   shadowSize: [41, 41],
 });
 
-type SwarmTrap = {
-  id: number;
-  latitude: number;
-  longitude: number;
-  label: string;
-  caughtSwarms: number;
-  lastUpdated: string;
-};
-
-const mockData: SwarmTrap[] = [
-  {
-    id: 1,
-    latitude: 42.7872,
-    longitude: -83.7729,
-    label: "Trap at Oak Tree",
-    caughtSwarms: 2,
-    lastUpdated: "2025-06-29",
-  },
-  {
-    id: 2,
-    latitude: 42.7881,
-    longitude: -83.7718,
-    label: "Field Edge Trap",
-    caughtSwarms: 1,
-    lastUpdated: "2025-06-25",
-  },
-  {
-    id: 3,
-    latitude: 42.7865,
-    longitude: -83.7735,
-    label: "Barn Roof Trap",
-    caughtSwarms: 0,
-    lastUpdated: "2025-06-22",
-  },
-  {
-    id: 4,
-    latitude: 42.7887,
-    longitude: -83.7742,
-    label: "Pine Grove Trap",
-    caughtSwarms: 3,
-    lastUpdated: "2025-06-30",
-  },
-  {
-    id: 5,
-    latitude: 42.7859,
-    longitude: -83.7721,
-    label: "Old Shed Trap",
-    caughtSwarms: 1,
-    lastUpdated: "2025-06-28",
-  },
-  {
-    id: 6,
-    latitude: 42.7877,
-    longitude: -83.7713,
-    label: "Creekside Trap",
-    caughtSwarms: 0,
-    lastUpdated: "2025-06-24",
-  },
-  {
-    id: 7,
-    latitude: 42.7862,
-    longitude: -83.7709,
-    label: "Orchard Trap",
-    caughtSwarms: 2,
-    lastUpdated: "2025-06-27",
-  },
-  {
-    id: 8,
-    latitude: 42.7883,
-    longitude: -83.7737,
-    label: "Hilltop Trap",
-    caughtSwarms: 4,
-    lastUpdated: "2025-06-26",
-  },
-  {
-    id: 9,
-    latitude: 42.7853,
-    longitude: -83.7751,
-    label: "South Pasture Trap",
-    caughtSwarms: 1,
-    lastUpdated: "2025-06-23",
-  },
-  {
-    id: 10,
-    latitude: 42.7868,
-    longitude: -83.7703,
-    label: "Tool Shed Trap",
-    caughtSwarms: 2,
-    lastUpdated: "2025-06-21",
-  },
-];
-
 export default function TestMap() {
-  const [traps, setTraps] = useState<SwarmTrap[]>([]);
+  const [traps, setTraps] = useState<SwarmInput[]>([]);
 
   useEffect(() => {
-    setTraps(mockData);
+    const fetchData = async () => {
+      const res = await fetch("/api/swarm");
+      const data = await res.json();
+      setTraps(data);
+    };
+    fetchData();
   }, []);
 
-  const lat = mockData[0]?.latitude || 42.6; // Default to Linden, MI if no traps
-  const lng = mockData[0]?.longitude || -83.6; // Default to
-  const center = [lat, lng] as [number, number];
+  const lat = traps[0]?.latitude || 42.787259;
+  const lng = traps[0]?.longitude || -83.7729;
+  const center: [number, number] = [lat, lng];
 
   return (
     <div style={{ height: "100vh", width: "100vw" }}>
@@ -141,8 +56,8 @@ export default function TestMap() {
             <Popup>
               <Card>
                 <Title order={5}>{trap.label}</Title>
-                <p>Swarms Caught: {trap.caughtSwarms}</p>
-                <p>Last Updated: {trap.lastUpdated}</p>
+                <p>{new Date(trap.installedAt).toLocaleDateString()}</p>
+                {trap.notes && <p>Notes: {trap.notes}</p>}
               </Card>
             </Popup>
           </Marker>

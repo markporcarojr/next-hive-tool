@@ -19,6 +19,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import TestMap from "./components/TestMap";
 
 const chartData = [
   { name: "Hive 1", harvest: 30 },
@@ -65,8 +66,7 @@ export default function HomePage() {
               </div>
 
               <div>
-                <Text fw={500}>Swarm Traps Set</Text>
-                <Title order={3}>2</Title>
+                <TestMap />
               </div>
 
               <div>
