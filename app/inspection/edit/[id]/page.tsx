@@ -19,9 +19,8 @@ import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { IconHeart, IconPlus } from "@tabler/icons-react";
 import { zodResolver } from "mantine-form-zod-resolver";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
 
 function getStrengthLabel(value: number) {
   if (value < 35) return "Weak";
@@ -124,8 +123,9 @@ export default function EditInspectionPage() {
       ...values,
       hiveId: Number(values.hiveId), // 👈 convert string to number
     };
+
     try {
-      const res = await fetch(`/api/inspection?id=${params.id}`, {
+      const res = await fetch(`/api/inspection/${params.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

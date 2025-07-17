@@ -72,7 +72,7 @@ export default function EditHivesPage({ params }: { params: { id: string } }) {
   const handleSubmit = async (values: HiveInput) => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/hives?id=${params.id}`, {
+      const res = await fetch(`/api/hives/${params.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

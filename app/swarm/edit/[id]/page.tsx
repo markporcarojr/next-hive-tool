@@ -69,7 +69,7 @@ export default function EditSwarmPage({ params }: { params: { id: string } }) {
     };
 
     fetchData();
-  }, [params.id, form, router]);
+  }, [params.id]);
 
   const onSubmit = async (values: SwarmInput) => {
     setLoading(true);

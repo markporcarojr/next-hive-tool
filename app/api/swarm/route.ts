@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { swarmTrapSchema } from "@/lib/schemas/swarmTrap";
+import { auth } from "@clerk/nextjs/server";
+import { NextRequest, NextResponse } from "next/server";
 
 // GET: /api/swarm
 export async function GET(req: NextRequest) {
