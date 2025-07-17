@@ -3,6 +3,35 @@ import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { swarmTrapSchema } from "@/lib/schemas/swarmTrap";
 
+// GET: /api/swarm/[id]
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  const { userId: clerkId } = await auth();
+  if (!clerkId)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  try {
+    const user = await prisma.user.findUnique({ where: { clerkId } });
+    if (!user)
+      return NextResponse.json({ error: "User not found" }, { status: 404 });
+
+    const swarm = await prisma.swarmTrap.findUnique({
+      where: { id: Number(params.id), userId: user.id },
+    });
+
+    if (!swarm) {
+      return NextResponse.json({ error: "Swarm not found" }, { status: 404 });
+    }
+
+    return NextResponse.json(swarm);
+  } catch (error) {
+    console.error("[SWARM_GET]", error);
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
+  }
+}
+
 // PATCH: /api/swarm?id=123
 export async function PATCH(req: NextRequest) {
   const { userId: clerkId } = await auth();

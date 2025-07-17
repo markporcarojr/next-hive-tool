@@ -3,23 +3,6 @@ import { inspectionSchema } from "@/lib/schemas/inspection";
 import { auth } from "@clerk/nextjs/server";
 import { NextRequest, NextResponse } from "next/server";
 
-// export async function GET(
-//   _: NextRequest,
-//   { params }: { params: { id: string } }
-// ) {
-//   try {
-//     const { id } = params;
-
-//     // const inspection = await Harvest.findById(id);
-//     const inspection = { id, mock: true };
-
-//     return NextResponse.json(inspection, { status: 200 });
-//   } catch (error) {
-//     console.error(error);
-//     return NextResponse.json({ message: "Server error" }, { status: 500 });
-//   }
-// }
-
 // PATCH: /api/inspections?id=123
 export async function PATCH(req: NextRequest) {
   const { userId: clerkId } = await auth();

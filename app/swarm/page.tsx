@@ -1,31 +1,31 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { SwarmInput } from "@/lib/schemas/swarmTrap";
 import {
-  Card,
-  Title,
-  Text,
-  Stack,
   Badge,
-  Pagination,
-  Group,
-  Divider,
   Button,
+  Card,
+  Divider,
+  Group,
   Modal,
+  Pagination,
+  Stack,
+  Text,
+  Title,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { IconX } from "@tabler/icons-react";
 import Link from "next/link";
-import { SwarmInput } from "@/lib/schemas/swarmTrap";
+import { useEffect, useState } from "react";
 
 const ITEMS_PER_PAGE = 4;
 
 export default function SwarmPage() {
   const [swarms, setSwarms] = useState<SwarmInput[]>([]);
-  const [page, setPage] = useState(1);
   const [swarmToDelete, setSwarmToDelete] = useState<number | null>(null);
   const [modalOpen, { open, close }] = useDisclosure(false);
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     const fetchSwarms = async () => {
@@ -65,10 +65,10 @@ export default function SwarmPage() {
       <Group justify="space-between" mb="md">
         <Title order={2}>Swarm Traps</Title>
         <Button
+          variant="filled"
+          color="#f4b400"
           component={Link}
           href="/swarm/new"
-          color="yellow"
-          variant="filled"
         >
           Add Swarm Trap
         </Button>

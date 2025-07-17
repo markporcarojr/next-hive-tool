@@ -22,6 +22,7 @@ model User {
   harvests   Harvest[]
   Hive       Hive[]
   Inspection Inspection[]
+  Inventory  Inventory[]
   SwarmTrap  SwarmTrap[]
 }
 
@@ -86,6 +87,17 @@ model Inspection {
   hiveId Int
   hive   Hive @relation(fields: [hiveId], references: [id], onDelete: Cascade)
 
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Inventory {
+  id        Int      @id @default(autoincrement())
+  name      String
+  quantity  Int
+  location  String
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }

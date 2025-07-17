@@ -1,143 +1,160 @@
+// app/inventory/page.tsx
 "use client";
 
+import { InventoryInput } from "@/lib/schemas/inventory";
 import {
-  ActionIcon,
-  Box,
   Button,
-  Container,
-  Divider,
+  Card,
   Group,
   Modal,
+  Pagination,
+  Select,
   Stack,
   Text,
-  TextInput,
   Title,
 } from "@mantine/core";
-import { showNotification } from "@mantine/notifications";
-import { IconPlus, IconTrash, IconX } from "@tabler/icons-react";
-import { useState } from "react";
+import { useDisclosure } from "@mantine/hooks";
+import { notifications } from "@mantine/notifications";
+import { IconX } from "@tabler/icons-react";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+
+const ITEMS_PER_PAGE = 10;
 
 export default function InventoryPage() {
-  const [inventory, setInventory] = useState([
-    { id: 1, name: "Brood Frames", count: 500 },
-    { id: 2, name: "Smoker Fuel", count: 12 },
-    { id: 3, name: "Hive Tool", count: 4 },
-    { id: 4, name: "Bee Suit", count: 2 },
-    { id: 5, name: "Queen Excluders", count: 6 },
-    { id: 6, name: "Bee Brush", count: 3 },
-    { id: 7, name: "Bottom Boards", count: 10 },
-    { id: 8, name: "Deep Hive Bodies", count: 8 },
-    { id: 9, name: "Medium Supers", count: 14 },
-    { id: 10, name: "Top Covers", count: 10 },
-    { id: 11, name: "Feeder Pails", count: 7 },
-    { id: 12, name: "Entrance Reducers", count: 15 },
-    { id: 13, name: "Queen Catchers", count: 5 },
-    { id: 14, name: "Nuc Boxes", count: 9 },
-    { id: 15, name: "Wax Foundation Sheets", count: 300 },
-  ]);
+  const [items, setItems] = useState<InventoryInput[]>([]);
+  const [page, setPage] = useState(1);
+  const [modalOpen, { open, close }] = useDisclosure(false);
+  const [selectedLocation, setSelectedLocation] = useState<string | null>(null);
+  const [inventoryToDelete, setInventoryToDelete] = useState<number | null>(
+    null
+  );
 
-  const [opened, setOpened] = useState(false);
-  const [newItem, setNewItem] = useState("");
+  useEffect(() => {
+    const fetchData = async () => {
+      const res = await fetch("/api/inventory");
+      const data = await res.json();
+      setItems(data);
+    };
+    fetchData();
+  }, []);
 
-  const handleAdd = () => {
-    if (!newItem.trim()) return;
-    const item = { id: Date.now(), name: newItem.trim() };
-    setInventory((prev) => [...prev, item]);
-    setNewItem("");
-    setOpened(false);
-  };
+  const filteredItems = selectedLocation
+    ? items.filter((item) => item.location === selectedLocation)
+    : items;
 
-  const handleDelete = (id: number) => {
-    const deletedItem = inventory.find((item) => item.id === id);
-    setInventory((prev) => prev.filter((item) => item.id !== id));
+  const start = (page - 1) * ITEMS_PER_PAGE;
+  const displayed = filteredItems.slice(start, start + ITEMS_PER_PAGE);
 
-    showNotification({
-      title: "Item Deleted",
-      message: `"${deletedItem?.name}" was removed from inventory.`,
-      color: "red",
-      icon: <IconX size={16} />,
+  const uniqueLocations = Array.from(
+    new Set(items.map((item) => item.location))
+  ).map((loc) => ({ label: loc, value: loc }));
+
+  const handleDelete = async () => {
+    if (!inventoryToDelete) return;
+
+    const res = await fetch(`/api/inventory?id=${inventoryToDelete}`, {
+      method: "DELETE",
     });
+
+    if (res.ok) {
+      setItems((prev) => prev.filter((h) => h.id !== inventoryToDelete));
+      close();
+      setInventoryToDelete(null);
+    } else {
+      notifications.show({
+        title: "Error",
+        message: "Failed to delete inventory record.",
+        color: "red",
+        icon: <IconX size={20} />,
+        autoClose: 4000,
+        withCloseButton: true,
+      });
+    }
   };
 
   return (
-    <Container>
+    <main style={{ padding: "2rem" }}>
       <Group justify="space-between" mb="md">
-        <div>
-          <Title order={1}>Inventory</Title>
-          <Text c="dimmed" size="sm">
-            Manage your equipment and tools below.
-          </Text>
-        </div>
+        <Title order={2}>Inventory</Title>
         <Button
-          leftSection={<IconPlus size={16} />}
-          onClick={() => setOpened(true)}
+          variant="filled"
+          color="#f4b400"
+          component={Link}
+          href="/inventory/new"
         >
-          Add Item
+          Add Inventory Item
         </Button>
+        <Select
+          placeholder="Filter by location"
+          data={uniqueLocations}
+          clearable
+          value={selectedLocation}
+          onChange={setSelectedLocation}
+        />
       </Group>
 
-      <Box component="section" mt="sm">
-        {inventory.length > 0 ? (
-          <Stack spacing="sm">
-            {inventory.map((item) => (
-              <Box key={item.id}>
-                <Box
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    padding: "0.5rem 0.75rem",
-                    borderRadius: "8px",
-                    transition: "background 0.2s ease",
-                  }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.background =
-                      "rgba(255,255,255,0.03)")
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.background = "transparent")
-                  }
-                >
-                  <Group gap="xs">
-                    <Text fw={600}>{item.name}</Text>
-                    <Text c="dimmed">({item.count})</Text>
-                  </Group>
-                  <ActionIcon
-                    variant="light"
-                    color="red"
-                    onClick={() => handleDelete(item.id)}
-                    aria-label={`Delete ${item.name}`}
-                  >
-                    <IconTrash size={18} />
-                  </ActionIcon>
-                </Box>
+      <Stack gap="sm">
+        {displayed.map((item) => (
+          <Card key={item.id} withBorder shadow="xs" padding="md">
+            <Group justify="space-between">
+              <Text fw={500}>{item.name}</Text>
+              <Text c="dimmed">Qty: {item.quantity}</Text>
+            </Group>
+            <Text size="sm" c="dimmed">
+              Location: {item.location}
+            </Text>
+            <Group justify="space-between">
+              <Button
+                size="xs"
+                variant="light"
+                component={Link}
+                href={`/inventory/edit/${item.id}`}
+              >
+                Edit
+              </Button>
+              <Button
+                color="red"
+                variant="light"
+                size="xs"
+                onClick={() => {
+                  setInventoryToDelete(item.id!);
+                  open();
+                }}
+              >
+                Delete
+              </Button>
+            </Group>
+          </Card>
+        ))}
+      </Stack>
 
-                <Divider my="sm" />
-              </Box>
-            ))}
-          </Stack>
-        ) : (
-          <Text c="dimmed">Your inventory is empty.</Text>
-        )}
-      </Box>
-
+      <Pagination
+        mt="xl"
+        total={Math.ceil(filteredItems.length / ITEMS_PER_PAGE)}
+        value={page}
+        onChange={setPage}
+        color="honey"
+      />
       <Modal
-        opened={opened}
-        onClose={() => setOpened(false)}
-        title="Add Inventory Item"
+        opened={modalOpen}
+        onClose={() => {
+          close();
+          setInventoryToDelete(null);
+        }}
+        title="Confirm Deletion"
         centered
       >
-        <TextInput
-          placeholder="e.g., Queen Catcher"
-          label="Item Name"
-          value={newItem}
-          onChange={(e) => setNewItem(e.currentTarget.value)}
-          withAsterisk
-        />
-        <Group justify="flex-end" mt="md">
-          <Button onClick={handleAdd}>Add</Button>
+        <Text mb="md">Are you sure you want to delete this record?</Text>
+        <Group justify="flex-end">
+          <Button variant="default" onClick={close}>
+            Cancel
+          </Button>
+          <Button color="red" onClick={handleDelete}>
+            Confirm Delete
+          </Button>
         </Group>
       </Modal>
-    </Container>
+    </main>
   );
 }

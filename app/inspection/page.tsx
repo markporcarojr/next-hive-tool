@@ -29,8 +29,6 @@ export default function InspectionPage() {
   const [modalOpen, { open, close }] = useDisclosure(false);
   const [page, setPage] = useState(1);
 
-  const start = (page - 1) * ITEMS_PER_PAGE;
-
   useEffect(() => {
     const fetchData = async () => {
       const res = await fetch("/api/inspection");
@@ -39,6 +37,9 @@ export default function InspectionPage() {
     };
     fetchData();
   }, []);
+
+  const start = (page - 1) * ITEMS_PER_PAGE;
+  const displayed = inspections.slice(start, start + ITEMS_PER_PAGE);
 
   const handleDelete = async () => {
     if (!inspectionToDelete) return;
@@ -57,13 +58,9 @@ export default function InspectionPage() {
         message: "Failed to delete inspection record.",
         color: "red",
         icon: <IconX size={20} />,
-        autoClose: 4000,
-        withCloseButton: true,
       });
     }
   };
-
-  const displayed = inspections.slice(start, start + ITEMS_PER_PAGE);
 
   return (
     <main style={{ padding: "2rem" }}>
@@ -108,9 +105,9 @@ export default function InspectionPage() {
                 Edit
               </Button>
               <Button
-                color="red"
                 variant="light"
                 size="xs"
+                color="red"
                 onClick={() => {
                   setInspectionToDelete(entry.id!);
                   open();
