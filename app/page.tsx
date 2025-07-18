@@ -19,7 +19,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import TestMap from "./components/TestMap";
+import TrapMap from "./components/TrapMap";
 
 const chartData = [
   { name: "Hive 1", harvest: 30 },
@@ -66,14 +66,21 @@ export default function HomePage() {
               </div>
 
               <div>
-                <TestMap />
-              </div>
-
-              <div>
                 <Text fw={500}>Some Other Stat</Text>
                 <Title order={3}>X</Title>
               </div>
             </SimpleGrid>
+          </Card>
+        </Grid.Col>
+
+        <Grid.Col span={{ base: 12, md: 6 }}>
+          <Card shadow="sm" padding="lg" radius="md" withBorder>
+            <Text fw={500} mb="xs">
+              Trap Locations
+            </Text>
+            <ResponsiveContainer width="100%" height={200}>
+              <TrapMap zoom={15} />
+            </ResponsiveContainer>
           </Card>
         </Grid.Col>
 
@@ -94,7 +101,7 @@ export default function HomePage() {
           <Card shadow="sm" padding="lg" radius="md" withBorder>
             <Title order={4}>Recent Inspections</Title>
             <Divider my="sm" />
-            <Stack spacing="xs">
+            <Stack gap="xs">
               <Text size="sm">Hive #3 – 2025-06-06: Brood pattern strong</Text>
               <Text size="sm">Hive #8 – 2025-06-05: Needs new super</Text>
               <Text size="sm">Hive #1 – 2025-06-04: Queen spotted, marked</Text>
