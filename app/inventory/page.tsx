@@ -63,6 +63,7 @@ export default function InventoryPage() {
       setInventoryToDelete(null);
     } else {
       notifications.show({
+        position: "top-center",
         title: "Error",
         message: "Failed to delete inventory record.",
         color: "red",

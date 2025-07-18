@@ -105,6 +105,7 @@ export default function EditInspectionPage() {
         });
       } catch (e) {
         notifications.show({
+          position: "top-center",
           title: "Error",
           message: "Failed to load data",
           color: "red",
@@ -136,6 +137,7 @@ export default function EditInspectionPage() {
       if (!res.ok) {
         const errorData = await res.json();
         notifications.show({
+          position: "top-center",
           title: "Error",
           message: errorData.message || "Failed to create inspection",
           color: "red",
@@ -144,6 +146,7 @@ export default function EditInspectionPage() {
       }
 
       notifications.show({
+        position: "top-center",
         title: "Inspection Updated",
         message: "Successfully Updates inspection",
         color: "green",
@@ -152,6 +155,7 @@ export default function EditInspectionPage() {
     } catch (error) {
       console.error(error);
       notifications.show({
+        position: "top-center",
         title: "Network Error",
         message: "Could not update inspection.",
         color: "red",

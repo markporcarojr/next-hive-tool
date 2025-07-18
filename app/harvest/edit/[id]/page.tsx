@@ -48,6 +48,7 @@ export default function EditHarvestPage({
         });
       } catch (e) {
         notifications.show({
+          position: "top-center",
           title: "Error",
           message: "Failed to load data",
           color: "red",
@@ -75,6 +76,7 @@ export default function EditHarvestPage({
       if (!res.ok) {
         const result = await res.json();
         notifications.show({
+          position: "top-center",
           title: "Error",
           message: result.message || "Update failed",
           color: "red",
@@ -83,6 +85,7 @@ export default function EditHarvestPage({
       }
 
       notifications.show({
+        position: "top-center",
         title: "Success",
         message: "Harvest updated!",
         color: "green",
@@ -90,6 +93,7 @@ export default function EditHarvestPage({
       router.push("/harvest");
     } catch (e) {
       notifications.show({
+        position: "top-center",
         title: "Error",
         message: "Something went wrong",
         color: "red",

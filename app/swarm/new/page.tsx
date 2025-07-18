@@ -47,6 +47,7 @@ export default function NewSwarmPage() {
       if (!res.ok) {
         const errorData = await res.json();
         notifications.show({
+          position: "top-center",
           title: "Error",
           message: errorData.message || "Failed to update swarm trap",
           color: "red",
@@ -54,6 +55,7 @@ export default function NewSwarmPage() {
         return;
       } else {
         notifications.show({
+          position: "top-center",
           title: "Success",
           message: "Swarm trap added successfully",
           color: "green",
@@ -62,6 +64,7 @@ export default function NewSwarmPage() {
       }
     } catch (error) {
       notifications.show({
+        position: "top-center",
         title: "Error",
         message: "Failed to update swarm trap",
         color: "red",

@@ -44,6 +44,7 @@ export default function EditSwarmPage({ params }: { params: { id: string } }) {
         const data = await res.json();
         if (!data) {
           notifications.show({
+            position: "top-center",
             title: "Error",
             message: "Swarm trap not found",
             color: "red",
@@ -52,7 +53,7 @@ export default function EditSwarmPage({ params }: { params: { id: string } }) {
         }
 
         form.setValues({
-          location: data.location,
+          label: data.label,
           latitude: data.latitude,
           longitude: data.longitude,
           installedAt: new Date(data.installedAt),
@@ -61,6 +62,7 @@ export default function EditSwarmPage({ params }: { params: { id: string } }) {
         });
       } catch (error) {
         notifications.show({
+          position: "top-center",
           title: "Error",
           message: "Failed to load swarm trap data",
           color: "red",
@@ -86,6 +88,8 @@ export default function EditSwarmPage({ params }: { params: { id: string } }) {
       if (!res.ok) {
         const errorData = await res.json();
         notifications.show({
+          position: "top-center",
+
           title: "Error",
           message: errorData.message || "Failed to update swarm trap",
           color: "red",
@@ -93,6 +97,7 @@ export default function EditSwarmPage({ params }: { params: { id: string } }) {
         return;
       } else {
         notifications.show({
+          position: "top-center",
           title: "Success",
           message: "Swarm trap updated successfully",
           color: "green",
@@ -101,6 +106,7 @@ export default function EditSwarmPage({ params }: { params: { id: string } }) {
       }
     } catch (error) {
       notifications.show({
+        position: "top-center",
         title: "Error",
         message: "Failed to update swarm trap",
         color: "red",

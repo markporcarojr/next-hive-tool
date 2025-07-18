@@ -52,6 +52,7 @@ export default function SwarmPage() {
       setSwarmToDelete(null);
     } else {
       notifications.show({
+        position: "top-center",
         title: "Error",
         message: "Failed to delete swarm trap.",
         color: "red",

@@ -56,6 +56,7 @@ export default function EditHivesPage({ params }: { params: { id: string } }) {
         });
       } catch (e) {
         notifications.show({
+          position: "top-center",
           title: "Error",
           message: "Failed to load data",
           color: "red",
@@ -84,12 +85,14 @@ export default function EditHivesPage({ params }: { params: { id: string } }) {
       if (!res.ok) {
         const errorData = await res.json();
         notifications.show({
+          position: "top-center",
           title: "Update failed",
           message: errorData.message || "Could not update hive.",
           color: "red",
         });
       } else {
         notifications.show({
+          position: "top-center",
           title: "Hive Updated",
           message: `Hive #${values.hiveNumber} was updated successfully.`,
           color: "green",
@@ -99,6 +102,7 @@ export default function EditHivesPage({ params }: { params: { id: string } }) {
     } catch (error) {
       console.error(error);
       notifications.show({
+        position: "top-center",
         title: "Network error",
         message: "Something went wrong.",
         color: "red",

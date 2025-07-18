@@ -44,6 +44,7 @@ export default function HivePage() {
       setHiveToDelete(null);
     } else {
       notifications.show({
+        position: "top-center",
         title: "Error",
         message: "Failed to delete hive record.",
         color: "red",

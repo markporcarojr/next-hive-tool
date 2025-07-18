@@ -55,6 +55,7 @@ export default function NewHivePage() {
       if (!res.ok) {
         const errorData = await res.json();
         notifications.show({
+          position: "top-center",
           title: "Error",
           message: errorData.message || "Failed to save hive",
           color: "red",
@@ -62,6 +63,7 @@ export default function NewHivePage() {
         return;
       } else {
         notifications.show({
+          position: "top-center",
           title: "Success",
           message: "Hive saved successfully",
           color: "green",
@@ -70,6 +72,7 @@ export default function NewHivePage() {
       }
     } catch (error) {
       notifications.show({
+        position: "top-center",
         title: "Error",
         message: "Failed to save hive",
         color: "red",

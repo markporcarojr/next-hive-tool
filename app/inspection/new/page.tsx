@@ -91,6 +91,7 @@ export default function CreateInspectionPage() {
       if (!res.ok) {
         const errorData = await res.json();
         notifications.show({
+          position: "top-center",
           title: "Error",
           message: errorData.message || "Failed to create inspection",
           color: "red",
@@ -99,6 +100,7 @@ export default function CreateInspectionPage() {
       }
 
       notifications.show({
+        position: "top-center",
         title: "Inspection Created",
         message: "Successfully added a new inspection",
         color: "green",
@@ -107,6 +109,7 @@ export default function CreateInspectionPage() {
     } catch (error) {
       console.error(error);
       notifications.show({
+        position: "top-center",
         title: "Network Error",
         message: "Could not create inspection.",
         color: "red",

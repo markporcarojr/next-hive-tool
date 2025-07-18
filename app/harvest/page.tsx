@@ -52,6 +52,7 @@ export default function HarvestPage() {
       setHarvestToDelete(null);
     } else {
       notifications.show({
+        position: "top-center",
         title: "Error",
         message: "Failed to delete harvest record.",
         color: "red",

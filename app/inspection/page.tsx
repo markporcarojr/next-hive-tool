@@ -54,6 +54,7 @@ export default function InspectionPage() {
       setInspectionToDelete(null);
     } else {
       notifications.show({
+        position: "top-center",
         title: "Error",
         message: "Failed to delete inspection record.",
         color: "red",

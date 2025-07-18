@@ -44,6 +44,7 @@ export default function CreateHarvestPage() {
 
       if (!res.ok) {
         notifications.show({
+          position: "top-center",
           title: "Error",
           message: result?.errors?.harvestType?.[0] || result.message,
           color: "red",
@@ -52,6 +53,7 @@ export default function CreateHarvestPage() {
       }
 
       notifications.show({
+        position: "top-center",
         title: "Harvest Added",
         message: `You recorded ${values.harvestAmount} lbs of ${values.harvestType}`,
         color: "green",
@@ -62,6 +64,7 @@ export default function CreateHarvestPage() {
     } catch (error) {
       console.error(error);
       notifications.show({
+        position: "top-center",
         title: "Network Error",
         message: "Could not save harvest. Please try again.",
         color: "red",
