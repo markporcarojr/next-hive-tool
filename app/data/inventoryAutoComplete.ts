@@ -1,28 +1,9 @@
-export const items = [
-  "Bee Brush",
-  "Bee Smoker",
-  "Beeswax Foundation",
-  "Feeder",
-  "Frame Grip",
-  "Hive Scale",
-  "Hive Tool",
-  "Honey Extractor",
-  "Nectar Collector",
-  "Pollen Trap",
-  "Propolis Scraper",
-  "Protective Gear",
-  "Queen Excluder",
-  "Swarm Catcher",
-  "Ventilated Gloves",
-];
-
 export const ITEM_NAMES = [
   "Bee Brush",
   "Bee Escape Board",
   "Bee Gloves",
   "Bee Jacket",
   "Bee Suit",
-  "Boot Covers",
   "Bottom Board",
   "Brood Frame Holder",
   "Cappings Tank",

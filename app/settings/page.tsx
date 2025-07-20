@@ -1,28 +1,78 @@
 "use client";
 
 import {
-  Container,
-  Title,
-  Text,
-  Divider,
-  Switch,
-  Group,
-  Stack,
-  TextInput,
   Button,
+  Container,
+  Group,
+  Loader,
   Paper,
+  Stack,
+  Text,
+  TextInput,
+  Title,
 } from "@mantine/core";
-import { useState } from "react";
+import { notifications } from "@mantine/notifications";
+import { useEffect, useState } from "react";
+import { ThemeToggle } from "../components/ThemeToggle";
 
 export default function SettingsPage() {
-  const [darkMode, setDarkMode] = useState(true);
-  const [username, setUsername] = useState("beekeeper123");
-  const [email, setEmail] = useState("beekeeper@example.com");
+  const [darkMode, setDarkMode] = useState(false);
+  const [address, setAddress] = useState("");
+  const [loading, setLoading] = useState(true);
 
-  const handleSave = () => {
-    console.log("Saved settings:", { username, email, darkMode });
-    // future: toast, save to DB, etc.
+  useEffect(() => {
+    const loadSettings = async () => {
+      try {
+        const res = await fetch("/api/settings");
+        if (res.ok) {
+          const data = await res.json();
+          setDarkMode(data.darkMode ?? false);
+          setAddress(data.address ?? "");
+        }
+      } catch (error) {
+        console.error("Failed to load settings:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadSettings();
+  }, []);
+
+  const handleSave = async () => {
+    try {
+      const res = await fetch("/api/settings", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ darkMode, address }),
+      });
+
+      if (res.ok) {
+        notifications.show({
+          title: "Settings saved",
+          message: "Your preferences have been updated.",
+          color: "green",
+        });
+      } else {
+        throw new Error("Failed to save");
+      }
+    } catch (err) {
+      console.error(err);
+      notifications.show({
+        title: "Error",
+        message: "Could not save your settings.",
+        color: "red",
+      });
+    }
   };
+
+  if (loading) {
+    return (
+      <Container>
+        <Loader />
+      </Container>
+    );
+  }
 
   return (
     <Container>
@@ -35,18 +85,13 @@ export default function SettingsPage() {
 
       <Paper withBorder p="md" radius="md" mb="xl">
         <Title order={3} mb="sm">
-          Profile
+          Hive Location
         </Title>
         <Stack>
           <TextInput
-            label="Username"
-            value={username}
-            onChange={(e) => setUsername(e.currentTarget.value)}
-          />
-          <TextInput
-            label="Email"
-            value={email}
-            onChange={(e) => setEmail(e.currentTarget.value)}
+            label="Hive Address"
+            value={address}
+            onChange={(e) => setAddress(e.currentTarget.value)}
           />
         </Stack>
       </Paper>
@@ -59,10 +104,7 @@ export default function SettingsPage() {
               Toggle the app’s color scheme preference.
             </Text>
           </div>
-          <Switch
-            checked={darkMode}
-            onChange={(e) => setDarkMode(e.currentTarget.checked)}
-          />
+          <ThemeToggle />
         </Group>
       </Paper>
 

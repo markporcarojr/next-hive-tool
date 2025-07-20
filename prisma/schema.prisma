@@ -24,6 +24,7 @@ model User {
   Inspection Inspection[]
   Inventory  Inventory[]
   SwarmTrap  SwarmTrap[]
+  settings   Settings?
 }
 
 model Harvest {
@@ -100,6 +101,16 @@ model Inventory {
   user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Settings {
+  id          Int      @id @default(autoincrement())
+  userId      Int      @unique
+  hiveAddress String?
+  darkMode    Boolean  @default(false)
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model SwarmTrap {

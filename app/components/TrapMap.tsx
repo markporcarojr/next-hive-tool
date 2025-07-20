@@ -69,26 +69,28 @@ export default function TrapMap({ zoom = 15, height = "400px" }: TrapMapProps) {
 
           <Overlay checked name="Swarm Traps">
             <LayerGroup>
-              {traps.map((trap) => (
-                <Marker
-                  key={trap.id}
-                  position={[trap.latitude, trap.longitude]}
-                  icon={honeyIcon}
-                >
-                  <Popup>
-                    <Card shadow="xs" padding="sm">
-                      <Title order={5}>{trap.label || "Unnamed Trap"}</Title>
-                      <Text size="sm">
-                        Trap Set:{" "}
-                        {new Date(trap.installedAt).toLocaleDateString()}
-                      </Text>
-                      <Text size="sm" c="dimmed">
-                        Label: {trap.label}
-                      </Text>
-                    </Card>
-                  </Popup>
-                </Marker>
-              ))}
+              {traps &&
+                traps.length > 0 &&
+                traps.map((trap) => (
+                  <Marker
+                    key={trap.id}
+                    position={[trap.latitude, trap.longitude]}
+                    icon={honeyIcon}
+                  >
+                    <Popup>
+                      <Card shadow="xs" padding="sm">
+                        <Title order={5}>{trap.label || "Unnamed Trap"}</Title>
+                        <Text size="sm">
+                          Trap Set:{" "}
+                          {new Date(trap.installedAt).toLocaleDateString()}
+                        </Text>
+                        <Text size="sm" c="dimmed">
+                          Label: {trap.label}
+                        </Text>
+                      </Card>
+                    </Popup>
+                  </Marker>
+                ))}
             </LayerGroup>
           </Overlay>
         </LayersControl>

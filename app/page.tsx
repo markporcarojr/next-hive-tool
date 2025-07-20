@@ -11,6 +11,7 @@ import {
   Title,
   SimpleGrid,
 } from "@mantine/core";
+import dynamic from "next/dynamic";
 import {
   Bar,
   BarChart,
@@ -19,7 +20,9 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import TrapMap from "./components/TrapMap";
+const TrapMap = dynamic(() => import("./components/TrapMap"), {
+  ssr: false,
+});
 
 const chartData = [
   { name: "Hive 1", harvest: 30 },

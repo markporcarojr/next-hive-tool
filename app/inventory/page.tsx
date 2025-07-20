@@ -19,7 +19,7 @@ import { IconX } from "@tabler/icons-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-const ITEMS_PER_PAGE = 10;
+const ITEMS_PER_PAGE = 5;
 
 export default function InventoryPage() {
   const [items, setItems] = useState<InventoryInput[]>([]);

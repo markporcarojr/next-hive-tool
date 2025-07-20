@@ -1,11 +1,17 @@
 "use client";
 
+import {
+  SignedIn,
+  SignedOut,
+  SignInButton,
+  SignUpButton,
+  UserButton,
+} from "@clerk/nextjs";
 import { Group } from "@mantine/core";
 import {
   IconArchive,
   IconLayoutDashboard,
   IconListCheck,
-  IconLogout,
   IconSeedling,
   IconSettings,
   IconTool,
@@ -34,7 +40,16 @@ export default function Navbar() {
       <div className={classes.navbarMain}>
         <Group className={classes.header} justify="space-between">
           <h1>Hive Tool</h1>
-          {/* <Code fw={700}>v2.0.1</Code> */}
+
+          <div className="flex items-center gap-4">
+            <SignedOut>
+              <SignInButton />
+              <SignUpButton />
+            </SignedOut>
+            <SignedIn>
+              <UserButton />
+            </SignedIn>
+          </div>
         </Group>
 
         {data.map((item) => (
@@ -51,16 +66,11 @@ export default function Navbar() {
       </div>
 
       <div className={classes.footer}>
-        <a
-          href="/logout"
-          className={classes.link}
-          onClick={(e) => {
-            console.log(e);
-          }}
-        >
-          <IconLogout className={classes.linkIcon} stroke={1.5} />
-          <span>Logout</span>
-        </a>
+        <div className={classes.copywright}>
+          <span className="text-black-500 dark:text-gray-400 text-sm flex items-center gap-2">
+            © {new Date().getFullYear()} Hive Tool. All rights reserved. | v1.0
+          </span>
+        </div>
       </div>
     </nav>
   );

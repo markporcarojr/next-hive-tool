@@ -1,21 +1,17 @@
-// File: app/layout.tsx
+// app/layout.tsx
+import { ClerkProvider } from "@clerk/nextjs";
 import {
-  ClerkProvider,
-  SignInButton,
-  SignUpButton,
-  SignedIn,
-  SignedOut,
-  UserButton,
-} from "@clerk/nextjs";
-import { MantineProvider } from "@mantine/core";
+  ColorSchemeScript,
+  MantineProvider,
+  mantineHtmlProps,
+} from "@mantine/core";
 import "@mantine/core/styles.css";
-import "@mantine/notifications/styles.css";
 import { Notifications } from "@mantine/notifications";
+import "@mantine/notifications/styles.css";
 import { Inter } from "next/font/google";
 import { ReactNode } from "react";
 import Navbar from "../app/components/Navbar";
 import "../app/globals.css";
-import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -27,19 +23,13 @@ export const metadata = {
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <ClerkProvider>
-      <html lang="en">
-        <body className={`${inter.className} bg-black text-white`}>
-          <header className="flex justify-end items-center p-4 gap-4 h-16">
-            <SignedOut>
-              <SignInButton />
-              <SignUpButton />
-            </SignedOut>
-            <SignedIn>
-              <UserButton />
-            </SignedIn>
-          </header>
+      <html lang="en" {...mantineHtmlProps} className={inter.className}>
+        <head>
+          <ColorSchemeScript />
+        </head>
+        <body>
           <MantineProvider
-            defaultColorScheme="dark"
+            defaultColorScheme="auto"
             theme={{
               colors: {
                 honey: [
@@ -60,11 +50,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             }}
           >
             <Notifications position="top-right" />
+
             <div className="flex min-h-screen">
               <Navbar />
-              <main className="flex-1 p-6 overflow-auto bg-[#fff8e1] text-[#3e2723] dark:bg-[#0a0a0a] dark:text-[#ededed] transition-colors duration-300 ease-in-out">
-                {children}
-              </main>
+              <main className="flex-1 p-6 overflow-auto">{children}</main>
             </div>
           </MantineProvider>
         </body>
