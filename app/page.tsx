@@ -20,9 +20,12 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-const TrapMap = dynamic(() => import("./components/TrapMap"), {
-  ssr: false,
-});
+const TrapMapWidget = dynamic(
+  () => import("./components/widgets/TrapMapWidget"),
+  {
+    ssr: false,
+  }
+);
 
 const chartData = [
   { name: "Hive 1", harvest: 30 },
@@ -77,14 +80,7 @@ export default function HomePage() {
         </Grid.Col>
 
         <Grid.Col span={{ base: 12, md: 6 }}>
-          <Card shadow="sm" padding="lg" radius="md" withBorder>
-            <Text fw={500} mb="xs">
-              Trap Locations
-            </Text>
-            <ResponsiveContainer width="100%" height={200}>
-              <TrapMap zoom={15} />
-            </ResponsiveContainer>
-          </Card>
+          <TrapMapWidget />
         </Grid.Col>
 
         <Grid.Col span={{ base: 12, md: 6 }}>
