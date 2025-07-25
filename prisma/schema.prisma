@@ -14,17 +14,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id         Int          @id @default(autoincrement())
-  clerkId    String       @unique
-  email      String       @unique
-  name       String?
-  harvests   Harvest[]
-  Hive       Hive[]
-  Inspection Inspection[]
-  Inventory  Inventory[]
-  SwarmTrap  SwarmTrap[]
-  settings   Settings?
+model Expense {
+  amount    Decimal  @db.Decimal(10, 2)
+  category  String
+  createdAt DateTime @default(now())
+  date      DateTime @default(now())
+  id        Int      @id @default(autoincrement())
+  item      String
+  notes     String? // Optional
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
 }
 
 model Harvest {
@@ -39,92 +39,133 @@ model Harvest {
 }
 
 model Hive {
-  id               Int          @id @default(autoincrement())
+  breed            String?
+  broodBoxes       Int?
+  createdAt        DateTime     @default(now())
+  frames           Int?
   hiveDate         DateTime
+  hiveImage        String?
   hiveNumber       Int?
   hiveSource       String
-  hiveImage        String?
-  broodBoxes       Int?
-  superBoxes       Int?
   hiveStrength     Int?
-  queenColor       String?
-  queenAge         String?
-  queenExcluder    String?
-  breed            String?
-  frames           Int?
-  todo             String?
-  userId           Int
-  user             User         @relation(fields: [userId], references: [id])
-  createdAt        DateTime     @default(now())
-  updatedAt        DateTime     @updatedAt
+  id               Int          @id @default(autoincrement())
   inspections      Inspection[]
   isFromSwarmTrap  Boolean      @default(false)
+  latitude         Float? // required for map
+  longitude        Float? // required for map
+  queenAge         String?
+  queenColor       String?
+  queenExcluder    String?
+  superBoxes       Int?
   swarmCaptureDate DateTime?
-  swarmTrapId      Int? // Optional link to trap
   swarmTrap        SwarmTrap?   @relation(fields: [swarmTrapId], references: [id])
+  swarmTrapId      Int? // Optional link to trap
+  todo             String?
+  updatedAt        DateTime     @updatedAt
+  user             User         @relation(fields: [userId], references: [id])
+  userId           Int
+}
+
+model Income {
+  amount    Decimal  @db.Decimal(10, 2)
+  createdAt DateTime @default(now())
+  date      DateTime
+  id        Int      @id @default(autoincrement())
+  notes     String?
+  source    String // e.g., "Honey Sale", "Candle Sale"
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
 }
 
 model Inspection {
-  id               Int      @id @default(autoincrement())
-  temperament      String
-  hiveStrength     Int
-  inspectionDate   DateTime
-  inspectionImage  String? // optional
-  queen            Boolean? // optional
-  queenCell        Boolean? // optional
   brood            Boolean? // optional
+  createdAt        DateTime @default(now())
   disease          Boolean? // optional
   eggs             Boolean? // optional
-  pests            String? // optional
   feeding          String? // optional
-  treatments       String? // optional
+  hive             Hive     @relation(fields: [hiveId], references: [id], onDelete: Cascade)
+  hiveId           Int
+  hiveStrength     Int
+  id               Int      @id @default(autoincrement())
+  inspectionDate   DateTime
+  inspectionImage  String? // optional
   inspectionNote   String? // optional
+  pests            String? // optional
+  queen            Boolean? // optional
+  queenCell        Boolean? // optional
+  temperament      String
+  treatments       String? // optional
+  updatedAt        DateTime @updatedAt
+  user             User     @relation(fields: [userId], references: [id])
+  userId           Int
   weatherCondition String? // optional
   weatherTemp      String? // optional
-
-  userId Int
-  user   User @relation(fields: [userId], references: [id])
-
-  hiveId Int
-  hive   Hive @relation(fields: [hiveId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 
 model Inventory {
+  createdAt DateTime @default(now())
   id        Int      @id @default(autoincrement())
+  location  String
   name      String
   quantity  Int
-  location  String
-  userId    Int
-  user      User     @relation(fields: [userId], references: [id])
-  createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+}
+
+model Invoice {
+  createdAt    DateTime @default(now())
+  customerName String
+  date         DateTime
+  description  String?
+  email        String?
+  id           Int      @id @default(autoincrement())
+  items        Json // e.g. array of expense items
+  phone        String?
+  title        String
+  total        Decimal  @db.Decimal(10, 2)
+  user         User     @relation(fields: [userId], references: [id])
+  userId       Int
 }
 
 model Settings {
-  id          Int      @id @default(autoincrement())
-  userId      Int      @unique
-  hiveAddress String?
-  darkMode    Boolean  @default(false)
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt   DateTime @default(now())
+  darkMode    Boolean  @default(false)
+  hiveAddress String?
+  id          Int      @id @default(autoincrement())
   updatedAt   DateTime @updatedAt
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      Int      @unique
 }
 
 model SwarmTrap {
+  createdAt   DateTime  @default(now())
+  hives       Hive[] // Linked hives that came from this trap
   id          Int       @id @default(autoincrement())
+  installedAt DateTime
   label       String // general description
   latitude    Float // required for map
   longitude   Float // required for map
   notes       String?
-  installedAt DateTime
   removedAt   DateTime?
-  userId      Int
+  updatedAt   DateTime  @updatedAt
   user        User      @relation(fields: [userId], references: [id])
-  hives       Hive[] // Linked hives that came from this trap
+  userId      Int
+}
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model User {
+  clerkId    String       @unique
+  email      String       @unique
+  Expense    Expense[]
+  harvests   Harvest[]
+  Hive       Hive[]
+  id         Int          @id @default(autoincrement())
+  Income     Income[]
+  Inspection Inspection[]
+  Inventory  Inventory[]
+  Invoice    Invoice[]
+  name       String?
+  settings   Settings?
+  SwarmTrap  SwarmTrap[]
 }

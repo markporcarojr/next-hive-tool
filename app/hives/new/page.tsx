@@ -1,5 +1,6 @@
 "use client";
 
+import MapPicker from "@/app/components/MapPicker";
 import { HiveInput, hiveSchema } from "@/lib/schemas/hive";
 import {
   Button,
@@ -18,7 +19,6 @@ import { notifications } from "@mantine/notifications";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { fa } from "zod/v4/locales";
 
 export default function NewHivePage() {
   const router = useRouter();
@@ -90,6 +90,15 @@ export default function NewHivePage() {
       </Title>
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <Stack>
+          <MapPicker
+            {...form.getInputProps("hiveLocation")}
+            initialLat={form.values.latitude}
+            initialLng={form.values.longitude}
+            onSelect={(lat, lng) => {
+              form.setFieldValue("latitude", lat);
+              form.setFieldValue("longitude", lng);
+            }}
+          />
           <DateInput label="Hive Date" {...form.getInputProps("hiveDate")} />
           <NumberInput
             label="Hive Number"

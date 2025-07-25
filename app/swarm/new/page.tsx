@@ -82,8 +82,6 @@ export default function NewSwarmPage() {
       </Title>
       <form onSubmit={form.onSubmit(onSubmit)}>
         <Stack>
-          <TextInput label="Label" required {...form.getInputProps("label")} />
-
           <MapPicker
             initialLat={form.values.latitude}
             initialLng={form.values.longitude}
@@ -92,6 +90,7 @@ export default function NewSwarmPage() {
               form.setFieldValue("longitude", lng);
             }}
           />
+          <TextInput label="Label" required {...form.getInputProps("label")} />
 
           <DateInput
             label="Installed At"

@@ -6,10 +6,10 @@ import {
   Checkbox,
   Divider,
   Grid,
+  SimpleGrid,
   Stack,
   Text,
   Title,
-  SimpleGrid,
 } from "@mantine/core";
 import dynamic from "next/dynamic";
 import {
@@ -20,6 +20,10 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+
+import { useEffect, useState } from "react";
+import QuickActionsWidget from "./components/widgets/QuickActionsWidget";
+
 const TrapMapWidget = dynamic(
   () => import("./components/widgets/TrapMapWidget"),
   {
@@ -35,6 +39,29 @@ const chartData = [
 ];
 
 export default function HomePage() {
+  const [hiveCount, setHiveCount] = useState<number>(0);
+  const [swarmTrapCount, setSwarmTrapCount] = useState<number>(0);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const res = await fetch("/api/hives");
+      const data = await res.json();
+      setHiveCount(Array.isArray(data) ? data.length : data.hives?.length ?? 0);
+    };
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    const fetchSwarmTraps = async () => {
+      const res = await fetch("/api/swarm");
+      const data = await res.json();
+      setSwarmTrapCount(
+        Array.isArray(data) ? data.length : data.traps?.length ?? 0
+      );
+    };
+    fetchSwarmTraps();
+  }, []);
+
   return (
     <main style={{ padding: "2rem" }}>
       <Title order={2} mb="md">
@@ -63,17 +90,17 @@ export default function HomePage() {
             <SimpleGrid cols={2} spacing="lg">
               <div>
                 <Text fw={500}>Total Hives</Text>
-                <Title order={3}>12</Title>
+                <Title order={3}>{hiveCount}</Title>
               </div>
 
               <div>
-                <Text fw={500}>Swarms This Season</Text>
-                <Title order={3}>2</Title>
+                <Text fw={500}>Swarms Traps Set</Text>
+                <Title order={3}>{swarmTrapCount}</Title>
               </div>
 
               <div>
-                <Text fw={500}>Some Other Stat</Text>
-                <Title order={3}>X</Title>
+                <Text fw={500}>Some Other Stat Test</Text>
+                <Title order={3}>XXXX</Title>
               </div>
             </SimpleGrid>
           </Card>
@@ -81,6 +108,9 @@ export default function HomePage() {
 
         <Grid.Col span={{ base: 12, md: 6 }}>
           <TrapMapWidget />
+        </Grid.Col>
+        <Grid.Col span={{ base: 12, md: 6 }}>
+          <QuickActionsWidget />
         </Grid.Col>
 
         <Grid.Col span={{ base: 12, md: 6 }}>
@@ -92,18 +122,6 @@ export default function HomePage() {
               <Checkbox label="Harvest honey from Hive #7" />
               <Checkbox label="Refill smoker fuel" defaultChecked />
               <Checkbox label="Update queen status" />
-            </Stack>
-          </Card>
-        </Grid.Col>
-
-        <Grid.Col span={{ base: 12, md: 6 }}>
-          <Card shadow="sm" padding="lg" radius="md" withBorder>
-            <Title order={4}>Recent Inspections</Title>
-            <Divider my="sm" />
-            <Stack gap="xs">
-              <Text size="sm">Hive #3 – 2025-06-06: Brood pattern strong</Text>
-              <Text size="sm">Hive #8 – 2025-06-05: Needs new super</Text>
-              <Text size="sm">Hive #1 – 2025-06-04: Queen spotted, marked</Text>
             </Stack>
           </Card>
         </Grid.Col>
