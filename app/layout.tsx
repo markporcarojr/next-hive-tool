@@ -57,13 +57,17 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <Notifications position="top-right" />
 
             <AppShell
-              padding="md"
+              padding={{ base: 16, sm: 24, md: 32 }}
               navbar={{
                 width: 250,
                 breakpoint: "sm",
                 collapsed: { mobile: true, desktop: false },
               }}
               withBorder={false}
+              header={{
+                height: { base: 64, sm: 0 }, // 64px on mobile, 0 on desktop
+                collapsed: false,
+              }}
             >
               {/* Desktop Header */}
               <AppShellHeader hiddenFrom="sm">
@@ -76,7 +80,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
               </AppShellNavbar>
 
               {/* Main content with custom mobile padding */}
-              <AppShellMain className="pt-24 sm:pt-5">{children}</AppShellMain>
+              <AppShellMain>{children}</AppShellMain>
             </AppShell>
           </MantineProvider>
         </body>

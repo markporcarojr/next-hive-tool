@@ -34,7 +34,8 @@ export default function HeaderNav() {
       hiddenFrom="sm"
       component="header"
       px="md"
-      py="sm"
+      py="xs"
+      className="mb-30"
       style={{
         borderBottom: "1px solid #ccc",
         backgroundColor: "var(--color-amber)",

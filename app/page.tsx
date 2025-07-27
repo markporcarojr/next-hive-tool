@@ -64,7 +64,7 @@ export default function HomePage() {
 
   return (
     <main>
-      <Title order={2} mb="md">
+      <Title order={2} mx="md">
         Welcome back, Mark 🐝
       </Title>
 
