@@ -10,7 +10,8 @@ import { Notifications } from "@mantine/notifications";
 import "@mantine/notifications/styles.css";
 import { Inter } from "next/font/google";
 import { ReactNode } from "react";
-import Navbar from "../app/components/Navbar";
+// import Navbar from "./components/ui/Navbar";
+import ResponsiveNavbar from "./components/ui/ResponsiveNavbar";
 import "../app/globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -52,7 +53,8 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <Notifications position="top-right" />
 
             <div className="flex min-h-screen">
-              <Navbar />
+              {/* <Navbar /> */}
+              <ResponsiveNavbar />
               <main className="flex-1 p-6 overflow-auto">{children}</main>
             </div>
           </MantineProvider>

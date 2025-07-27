@@ -1,6 +1,6 @@
 // File: app/page.tsx (Home/Dashboard page)
 "use client";
-
+import FinanceWidget from "./components/widgets/FinanceWidget";
 import {
   Card,
   Checkbox,
@@ -69,6 +69,9 @@ export default function HomePage() {
       </Title>
 
       <Grid gutter="xl">
+        <Grid.Col span={{ base: 12, md: 6 }}>
+          <FinanceWidget />
+        </Grid.Col>
         <Grid.Col span={{ base: 12, md: 6 }}>
           <Card shadow="sm" padding="lg" radius="md" withBorder>
             <Text fw={500} mb="xs">
