@@ -63,7 +63,7 @@ export default function HomePage() {
   }, []);
 
   return (
-    <main style={{ padding: "2rem" }}>
+    <main>
       <Title order={2} mb="md">
         Welcome back, Mark 🐝
       </Title>

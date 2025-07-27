@@ -2,18 +2,17 @@
 
 import {
   Burger,
-  Drawer,
   Group,
-  Stack,
-  UnstyledButton,
   Text,
   Box,
+  Drawer,
+  Stack,
+  UnstyledButton,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
+import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { UserButton } from "@clerk/nextjs";
-import classes from "./Navbar.module.css";
 
 const links = [
   { href: "/", label: "Dashboard" },
@@ -26,38 +25,29 @@ const links = [
   { href: "/settings", label: "Settings" },
 ];
 
-export default function ResponsiveNavbar() {
+export default function HeaderNav() {
   const [opened, { toggle, close }] = useDisclosure(false);
   const pathname = usePathname();
 
   return (
-    <>
-      {/* Top bar for mobile */}
-      <Group
-        justify="space-between"
-        p="md"
-        style={{
-          position: "fixed",
-          top: 0,
-          width: "100%",
-          borderBottom: "1px solid #ccc",
-          backgroundColor: "var(--color-amber)",
-          color: "var(--color-black)",
-          boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.1)",
-          zIndex: 1000,
-        }}
-        hiddenFrom="sm"
-      >
-        <Group gap="xs">
-          <Burger color="black" opened={opened} onClick={toggle} size="sm" />
-        </Group>
+    <Box
+      hiddenFrom="sm"
+      component="header"
+      px="md"
+      py="sm"
+      style={{
+        borderBottom: "1px solid #ccc",
+        backgroundColor: "var(--color-amber)",
+        color: "var(--color-black)",
+      }}
+    >
+      <Group justify="space-between">
+        <Burger opened={opened} onClick={toggle} size="sm" color="black" />
         <Text c="black" fw={700} fz="xl">
           Hive Tool
         </Text>
         <UserButton />
       </Group>
-      {/* ✅ Spacer added right after fixed nav */}
-      <Box hiddenFrom="sm" h={64} />
       <Drawer
         opened={opened}
         onClose={close}
@@ -125,30 +115,6 @@ export default function ResponsiveNavbar() {
           </Text>
         </Box>
       </Drawer>
-
-      {/* Sidebar for desktop */}
-      <Box visibleFrom="sm">
-        <nav className={classes.navbar}>
-          <div className={classes.navbarMain}>
-            <Group className={classes.header} justify="space-between">
-              <Text fw={700}>Hive Tool</Text>
-            </Group>
-            {links.map((link) => (
-              <Link
-                href={link.href}
-                key={link.label}
-                className={classes.link}
-                data-active={pathname === link.href || undefined}
-              >
-                <span>{link.label}</span>
-              </Link>
-            ))}
-          </div>
-          <div className={classes.footer}>
-            <UserButton />
-          </div>
-        </nav>
-      </Box>
-    </>
+    </Box>
   );
 }

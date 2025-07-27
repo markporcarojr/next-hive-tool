@@ -47,7 +47,13 @@ export default function TrapMapWidget({
       : [42.78, -83.77];
 
   return (
-    <Card withBorder shadow="sm" radius="md" p="md" style={{ height }}>
+    <Card
+      withBorder
+      shadow="sm"
+      radius="md"
+      p="md"
+      style={{ height, zIndex: 0 }}
+    >
       <Title order={4} mb="sm">
         Swarm Trap Map
       </Title>
@@ -102,7 +108,11 @@ export default function TrapMapWidget({
                           </Title>
                           <Text size="sm">
                             Trap Set:{" "}
-                            {new Date(trap.installedAt).toLocaleDateString()}
+                            {
+                              new Date(trap.installedAt)
+                                .toISOString()
+                                .split("T")[0]
+                            }
                           </Text>
                           <Text size="sm" c="dimmed">
                             Label: {trap.label}

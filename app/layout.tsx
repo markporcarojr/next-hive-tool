@@ -1,6 +1,10 @@
 // app/layout.tsx
 import { ClerkProvider } from "@clerk/nextjs";
 import {
+  AppShell,
+  AppShellHeader,
+  AppShellNavbar,
+  AppShellMain,
   ColorSchemeScript,
   MantineProvider,
   mantineHtmlProps,
@@ -10,9 +14,9 @@ import { Notifications } from "@mantine/notifications";
 import "@mantine/notifications/styles.css";
 import { Inter } from "next/font/google";
 import { ReactNode } from "react";
-// import Navbar from "./components/ui/Navbar";
-import ResponsiveNavbar from "./components/ui/ResponsiveNavbar";
 import "../app/globals.css";
+import SidebarNav from "./components/ui/SideBarNav";
+import HeaderNav from "./components/ui/HeaderNav";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -52,11 +56,28 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           >
             <Notifications position="top-right" />
 
-            <div className="flex min-h-screen">
-              {/* <Navbar /> */}
-              <ResponsiveNavbar />
-              <main className="flex-1 p-6 overflow-auto">{children}</main>
-            </div>
+            <AppShell
+              padding="md"
+              navbar={{
+                width: 250,
+                breakpoint: "sm",
+                collapsed: { mobile: true, desktop: false },
+              }}
+              withBorder={false}
+            >
+              {/* Desktop Header */}
+              <AppShellHeader hiddenFrom="sm">
+                <HeaderNav />
+              </AppShellHeader>
+
+              {/* Desktop Sidebar */}
+              <AppShellNavbar visibleFrom="sm">
+                <SidebarNav />
+              </AppShellNavbar>
+
+              {/* Main content with custom mobile padding */}
+              <AppShellMain className="pt-24 sm:pt-5">{children}</AppShellMain>
+            </AppShell>
           </MantineProvider>
         </body>
       </html>
