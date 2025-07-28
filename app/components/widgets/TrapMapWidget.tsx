@@ -12,7 +12,6 @@ import {
   Marker,
   Popup,
   TileLayer,
-  ZoomControl,
 } from "react-leaflet";
 
 const { BaseLayer, Overlay } = LayersControl;
@@ -72,8 +71,6 @@ export default function TrapMapWidget({
           scrollWheelZoom={true}
           style={{ height: "100%", width: "100%" }}
         >
-          <ZoomControl position="bottomright" />
-
           <LayersControl position="topright">
             {/* Satellite View */}
             <BaseLayer checked name="Satellite View">

@@ -1,6 +1,12 @@
 "use client";
 
-import { UserButton } from "@clerk/nextjs";
+import {
+  SignedOut,
+  SignedIn,
+  UserButton,
+  SignInButton,
+  SignUpButton,
+} from "@clerk/nextjs";
 import { Box, Group, Text } from "@mantine/core";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -26,7 +32,16 @@ export default function SidebarNav() {
         <div className={classes.navbarMain}>
           <Group className={classes.header} justify="space-between">
             <Text fw={700}>Hive Tool</Text>
+            <SignedIn>
+              <UserButton />
+            </SignedIn>
           </Group>
+          <div className="flex items-center gap-4">
+            <SignedOut>
+              <SignInButton />
+              <SignUpButton />
+            </SignedOut>
+          </div>
           {links.map((link) => (
             <Link
               href={link.href}
@@ -39,7 +54,12 @@ export default function SidebarNav() {
           ))}
         </div>
         <div className={classes.footer}>
-          <UserButton />
+          <div className={classes.copywright}>
+            <span className="text-black-500 dark:text-gray-400 text-sm flex items-center gap-2">
+              © {new Date().getFullYear()} Hive Tool. All rights reserved. |
+              v1.0
+            </span>
+          </div>
         </div>
       </nav>
     </Box>

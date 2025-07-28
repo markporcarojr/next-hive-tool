@@ -15,4 +15,4 @@ export const invoiceSchema = z.object({
   total: z.coerce.number().nonnegative(),
 });
 export type InvoiceItem = z.infer<typeof invoiceItemSchema>;
-export type Invoice = z.infer<typeof invoiceSchema>;
+export type InvoiceInput = z.infer<typeof invoiceSchema>;

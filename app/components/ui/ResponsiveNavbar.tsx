@@ -1,18 +1,18 @@
 "use client";
 
+import { UserButton } from "@clerk/nextjs";
 import {
+  Box,
   Burger,
   Drawer,
   Group,
   Stack,
-  UnstyledButton,
   Text,
-  Box,
+  UnstyledButton,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { UserButton } from "@clerk/nextjs";
 import classes from "./Navbar.module.css";
 
 const links = [
