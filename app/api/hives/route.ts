@@ -34,19 +34,26 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
   }
 
-  const body = await req.json();
-  const parsed = hiveSchema.safeParse(body);
+  const user = await prisma.user.findUnique({
+    where: { clerkId },
+  });
 
-  if (!parsed.success) {
-    return NextResponse.json(
-      { errors: parsed.error.flatten().fieldErrors },
-      { status: 400 }
-    );
+  if (!user) {
+    return NextResponse.json({ message: "User not found" }, { status: 404 });
   }
 
-  const data = parsed.data;
-
   try {
+    const body = await req.json();
+    const parsed = hiveSchema.safeParse(body);
+
+    if (!parsed.success) {
+      return NextResponse.json(
+        { errors: parsed.error.flatten().fieldErrors },
+        { status: 400 }
+      );
+    }
+
+    const data = parsed.data;
     const user = await prisma.user.findUnique({
       where: { clerkId },
     });
