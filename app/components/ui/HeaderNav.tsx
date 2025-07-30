@@ -13,6 +13,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import links from "@data/navLinks"; // Assuming you have a separate file for links
 
 const links = [
   { href: "/", label: "Dashboard" },
@@ -21,7 +22,7 @@ const links = [
   { href: "/inspection", label: "Inspections" },
   { href: "/swarm", label: "Swarms" },
   { href: "/inventory", label: "Inventory" },
-  { href: "/finance", label: "Finance" },
+  { href: "/finance/", label: "Finance" },
   { href: "/settings", label: "Settings" },
 ];
 

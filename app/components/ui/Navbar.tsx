@@ -21,6 +21,7 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import classes from "./Navbar.module.css";
+import { navLinks } from "../../data/navLinks";
 
 const data = [
   { link: "/", label: "Dashboard", icon: IconLayoutDashboard },
@@ -52,7 +53,7 @@ export default function Navbar() {
           </div>
         </Group>
 
-        {data.map((item) => (
+        {navLinks.map((item) => (
           <Link
             href={item.link}
             key={item.label}

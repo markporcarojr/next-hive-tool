@@ -11,6 +11,7 @@ import { Box, Group, Text } from "@mantine/core";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import classes from "./SideBarNav.module.css";
+import { navLinks } from "../../data/navLinks"; // Assuming you have a separate file for links
 
 const links = [
   { href: "/", label: "Dashboard" },
@@ -42,7 +43,7 @@ export default function SidebarNav() {
               <SignUpButton />
             </SignedOut>
           </div>
-          {links.map((link) => (
+          {navLinks.map((link) => (
             <Link
               href={link.href}
               key={link.label}
