@@ -1,70 +1,46 @@
-import { Button } from "@mantine/core";
+import { auth } from "@clerk/nextjs/server";
+import { prisma } from "@/lib/prisma";
+import { Button, Card, Group, Table, Text, Title } from "@mantine/core";
 import Link from "next/link";
-import React from "react";
 
-type Expense = {
-  id: number;
-  description: string;
-  amount: number;
-  date: string;
-};
+export default async function ExpensePage() {
+  const { userId: clerkId } = await auth();
+  if (!clerkId) return <Text c="red">Unauthorized</Text>;
 
-const mockExpenses: Expense[] = [
-  { id: 1, description: "Office Supplies", amount: 120.5, date: "2024-06-01" },
-  { id: 2, description: "Travel", amount: 350, date: "2024-06-03" },
-  {
-    id: 3,
-    description: "Software Subscription",
-    amount: 89.99,
-    date: "2024-06-05",
-  },
-];
+  const user = await prisma.user.findUnique({ where: { clerkId } });
+  if (!user) return <Text c="red">User not found</Text>;
 
-const ExpensesPage = () => {
-  const total = mockExpenses.reduce((sum, exp) => sum + exp.amount, 0);
+  const expenses = await prisma.expense.findMany({
+    where: { userId: user.id },
+    orderBy: { date: "desc" },
+  });
 
   return (
-    <div>
-      <h1>Expenses Summary</h1>
-      <Button
-        variant="filled"
-        color="#f4b400"
-        component={Link}
-        href="/finance/expenses/new"
-      >
-        Add Expenses
-      </Button>
-      <p>Total: ${total.toFixed(2)}</p>
-      <table>
+    <Card withBorder p="lg" shadow="sm">
+      <Group justify="space-between" mb="md">
+        <Title order={3}>Expenses</Title>
+        {/* <Button component={Link} href="/finance/expense/new">
+          Add Expense
+        </Button> */}
+      </Group>
+      <Table highlightOnHover withColumnBorders>
         <thead>
           <tr>
+            <th>Item</th>
+            <th>Amount</th>
             <th>Date</th>
-            <th>Description</th>
-            <th>Amount ($)</th>
           </tr>
         </thead>
         <tbody>
-          {mockExpenses.map((expense) => (
+          {expenses.map((expense) => (
             <tr key={expense.id}>
-              <td>{expense.date}</td>
-              <td>{expense.description}</td>
-              <td>{expense.amount.toFixed(2)}</td>
+              <td>{expense.item}</td>
+              <td>${expense.amount.toFixed(2)}</td>
+              <td>{new Date(expense.date).toLocaleDateString()}</td>
             </tr>
           ))}
         </tbody>
-        <tfoot>
-          <tr>
-            <td colSpan={2}>
-              <strong>Total</strong>
-            </td>
-            <td>
-              <strong>{total.toFixed(2)}</strong>
-            </td>
-          </tr>
-        </tfoot>
-      </table>
-    </div>
+      </Table>
+    </Card>
   );
-};
-
-export default ExpensesPage;
+}

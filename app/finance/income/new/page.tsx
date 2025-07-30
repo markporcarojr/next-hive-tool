@@ -3,8 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "mantine-form-zod-resolver";
-import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { useForm } from "@mantine/form";
 import { incomeSchema, IncomeInput } from "@/lib/schemas/income";
 import {
   Button,
@@ -15,20 +14,20 @@ import {
   Stack,
   Text,
   Title,
-import { useForm, zodResolver } from "@mantine/form";
-import { IncomeInput, incomeSchema } from "@/lib/schemas/income";
-import {
 } from "@mantine/core";
+
 import { DateInput } from "@mantine/dates";
 
 export default function NewIncomePage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+
   const form = useForm<IncomeInput>({
     initialValues: {
+      source: "",
       amount: 0,
       date: new Date(),
-      description: "",
+      notes: "",
     },
     validate: zodResolver(incomeSchema),
   });
@@ -42,7 +41,7 @@ export default function NewIncomePage() {
       });
 
       if (res.ok) {
-        router.push("/finance");
+        router.push("/finance/income");
       } else {
         const error = await res.json();
         alert(error.error || "Something went wrong.");
@@ -60,47 +59,51 @@ export default function NewIncomePage() {
       <Title order={3} mb="lg">
         Add New Income
       </Title>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
-        <Stack gap="sm">
-          <TextInput label="Source" {...form.register("source")} />
+      <form onSubmit={form.onSubmit(onSubmit)}>
+        <Stack>
+          <TextInput
+            label="Source"
+            placeholder="e.g., Honey Sale, Candle Sale"
+            {...form.getInputProps("source")}
+          />
           <NumberInput
             label="Amount"
-            {...form.register("amount")}
-            parser={(value) => value?.replace(/\$\s?|(,*)/g, "") || ""}
-            formatter={(value) =>
-              !Number.isNaN(parseFloat(value || ""))
-                ? `$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                : ""
-            }
+            placeholder="Enter amount"
+            {...form.getInputProps("amount")}
+            min={0}
+            step={0.01}
           />
-          <DateInput label="Date" {...form.register("date")} />
-
-      <DateInput          <TextInput label="Notes" {...form.register("notes")} />
-          <Group justify="flex-end" mt="md">
+          <DateInput
+            placeholder="Select date"
+            clearable={false}
+            required
+            minDate={new Date("2020-01-01")}
+            maxDate={new Date()}
+            error={form.errors.date ? form.errors.date : undefined}
+            {...form.getInputProps("date")}
+          />
+          <TextInput
+            label="Notes"
+            placeholder="Optional notes"
+            {...form.getInputProps("notes")}
+          />
+          <Group mt="md">
             <Button type="submit" loading={loading}>
-              Save Income
+              Submit
+            </Button>
+
+            <Button
+              variant="outline"
+              onClick={() => router.push("/finance/income")}
+            >
+              Cancel
             </Button>
           </Group>
         </Stack>
       </form>
+      <Text mt="md" size="sm" color="dimmed">
+        Please ensure all fields are filled out correctly before submitting.
+      </Text>
     </Card>
   );
 }
-
-      label="Date"
-      {...form.getInputProps("date")}
-      valueFormat="YYYY-MM-DD"
-      />
-      <TextInput
-      label="Notes"
-      {...form.getInputProps("notes")}
-      />
-      <Group justify="flex-end" mt="md">
-      <Button type="submit" loading={loading}>
-        Save Income
-      </Button>
-      </Group>
-    </Stack>
-    </form>
-  </Card>
-  );  );/>
