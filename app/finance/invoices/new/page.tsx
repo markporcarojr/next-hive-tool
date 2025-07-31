@@ -2,16 +2,16 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { invoiceSchema, InvoiceInput } from "@/lib/schemas/invoice";
 import { useForm } from "@mantine/form";
 import { zodResolver } from "mantine-form-zod-resolver";
-
+import { invoiceSchema, InvoiceInput } from "@/lib/schemas/invoice";
 import {
   Button,
   Card,
   Group,
   NumberInput,
   Stack,
+  Textarea,
   TextInput,
   Title,
 } from "@mantine/core";
@@ -23,12 +23,14 @@ export default function NewInvoicePage() {
 
   const form = useForm<InvoiceInput>({
     initialValues: {
-      title: "", // required
-      date: new Date(), // required
-      customerName: "", // required
-      notes: "", // optional
-      items: [], // optional, can be empty array
-      total: 0, // required, will be calculated from items
+      title: "",
+      customerName: "",
+      email: "",
+      phone: "",
+      description: "",
+      date: new Date(),
+      total: 0,
+      items: [],
     },
     validate: zodResolver(invoiceSchema),
   });
@@ -60,15 +62,72 @@ export default function NewInvoicePage() {
       <Title order={3} mb="lg">
         New Invoice
       </Title>
-      <Form></Form>
-      <Stack spacing="lg">
-        <TextInput
-          label="Invoice Title"
-          required
-          placeholder="Invoice Title"
-          {...form.getInputProps("title")}
-        />
-      </Stack>
+      <form onSubmit={form.onSubmit(onSubmit)}>
+        <Stack gap="sm">
+          <TextInput
+            label="Invoice Title"
+            placeholder="e.g. Beekeeping Services"
+            {...form.getInputProps("title")}
+          />
+          <TextInput
+            label="Customer Name"
+            placeholder="e.g. John Appleseed"
+            {...form.getInputProps("customerName")}
+          />
+          <TextInput
+            label="Email"
+            placeholder="e.g. john@example.com"
+            {...form.getInputProps("email")}
+          />
+          <TextInput
+            label="Phone"
+            placeholder="e.g. (555) 123-4567"
+            {...form.getInputProps("phone")}
+          />
+          <Textarea
+            label="Description"
+            placeholder="e.g. Hive removal and inspection"
+            autosize
+            minRows={2}
+            {...form.getInputProps("description")}
+          />
+          <DateInput
+            label="Date"
+            valueFormat="YYYY-MM-DD"
+            {...form.getInputProps("date")}
+          />
+          <NumberInput
+            label="Total"
+            hideControls
+            {...form.getInputProps("total")}
+          />
+          <TextInput
+            label="Items (comma-separated)"
+            placeholder="e.g. Hive box, Smoker, Gloves"
+            value={form.values.items?.join(", ") ?? ""}
+            onChange={(e) =>
+              form.setFieldValue(
+                "items",
+                e.currentTarget.value
+                  .split(",")
+                  .map((item) => item.trim())
+                  .filter(Boolean)
+                  .map((desc) => ({
+                    description: desc,
+                    quantity: 1,
+                    unitPrice: 0,
+                  }))
+              )
+            }
+          />
+
+          <Group justify="flex-end" mt="md">
+            <Button type="submit" loading={loading}>
+              Save Invoice
+            </Button>
+          </Group>
+        </Stack>
+      </form>
     </Card>
   );
 }

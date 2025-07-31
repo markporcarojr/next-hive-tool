@@ -10,9 +10,15 @@ export const invoiceSchema = z.object({
   customerName: z.string().min(1, "Customer name is required"),
   title: z.string().min(1, "Title is required"),
   date: z.coerce.date(),
+  email: z.string().email("Invalid email format").optional(),
   dueDate: z.coerce.date().optional(),
+  phone: z
+    .string()
+    .regex(/^\d{10}$/)
+    .optional(),
   items: z.array(invoiceItemSchema).min(1, "At least one item is required"),
   notes: z.string().optional(),
+  description: z.string().optional(),
   total: z.coerce.number().nonnegative(),
 });
 

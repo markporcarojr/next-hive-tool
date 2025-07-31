@@ -66,6 +66,8 @@ export default function NewExpensePage() {
           <NumberInput
             label="Amount"
             placeholder="Amount"
+            min={0}
+            step={0.01}
             {...form.getInputProps("amount")}
           />
           <DateInput
