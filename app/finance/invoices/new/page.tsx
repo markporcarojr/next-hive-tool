@@ -1,50 +1,99 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { useForm } from "@mantine/form";
-import { zodResolver } from "mantine-form-zod-resolver";
-import { invoiceSchema, InvoiceInput } from "@/lib/schemas/invoice";
+import {
+  InvoiceInput,
+  InvoiceItemInput,
+  PRODUCT_TYPES,
+  PRODUCT_TYPE_VALUES,
+  invoiceSchema,
+} from "@/lib/schemas/invoice";
 import {
   Button,
   Card,
+  Divider,
   Group,
   NumberInput,
+  Select,
   Stack,
-  Textarea,
   TextInput,
+  Textarea,
   Title,
 } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
+import { useForm } from "@mantine/form";
+import { zodResolver } from "mantine-form-zod-resolver";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+
+const PRICE_MAP: Record<(typeof PRODUCT_TYPE_VALUES)[number], number> = {
+  honey: 8,
+  "honey bulk": 30,
+  "candles small": 5,
+  "candles med": 10,
+  "candles lg": 15,
+  "morel candle $8": 8,
+  "morel candle $10": 10,
+  "honey bundle": 20,
+  misc: 0,
+};
 
 export default function NewInvoicePage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  const form = useForm<InvoiceInput>({
+  const [items, setItems] = useState<InvoiceItemInput[]>([
+    { product: "honey", quantity: 1, unitPrice: PRICE_MAP["honey"] },
+  ]);
+
+  const form = useForm<Omit<InvoiceInput, "items" | "total">>({
     initialValues: {
-      title: "",
       customerName: "",
       email: "",
       phone: "",
-      description: "",
       date: new Date(),
-      total: 0,
-      items: [],
+      notes: "",
     },
-    validate: zodResolver(invoiceSchema),
+    validate: zodResolver(invoiceSchema.omit({ items: true, total: true })),
   });
 
-  const onSubmit = async (values: InvoiceInput) => {
+  const calculateTotal = () =>
+    items.reduce((sum, item) => sum + item.quantity * item.unitPrice, 0);
+
+  const updateItem = (index: number, updated: Partial<InvoiceItemInput>) => {
+    setItems((prev) => {
+      const copy = [...prev];
+      copy[index] = { ...copy[index], ...updated };
+      return copy;
+    });
+  };
+
+  const addItem = () => {
+    setItems((prev) => [
+      ...prev,
+      { product: "honey", quantity: 1, unitPrice: PRICE_MAP["honey"] },
+    ]);
+  };
+
+  const removeItem = (index: number) => {
+    setItems((prev) => prev.filter((_, i) => i !== index));
+  };
+
+  const onSubmit = async () => {
+    const values: InvoiceInput = {
+      ...form.values,
+      items,
+      total: calculateTotal(),
+    };
+
     setLoading(true);
     try {
-      const res = await fetch("/api/finance/invoice", {
+      const res = await fetch("/api/finance/invoices", {
         method: "POST",
         body: JSON.stringify(values),
       });
 
       if (res.ok) {
-        router.push("/finance");
+        router.push("/finance/invoices");
       } else {
         const error = await res.json();
         alert(error.error || "Failed to create invoice");
@@ -65,11 +114,6 @@ export default function NewInvoicePage() {
       <form onSubmit={form.onSubmit(onSubmit)}>
         <Stack gap="sm">
           <TextInput
-            label="Invoice Title"
-            placeholder="e.g. Beekeeping Services"
-            {...form.getInputProps("title")}
-          />
-          <TextInput
             label="Customer Name"
             placeholder="e.g. John Appleseed"
             {...form.getInputProps("customerName")}
@@ -81,44 +125,75 @@ export default function NewInvoicePage() {
           />
           <TextInput
             label="Phone"
-            placeholder="e.g. (555) 123-4567"
+            placeholder="e.g. 5551234567"
             {...form.getInputProps("phone")}
           />
-          <Textarea
-            label="Description"
-            placeholder="e.g. Hive removal and inspection"
-            autosize
-            minRows={2}
-            {...form.getInputProps("description")}
-          />
           <DateInput
-            label="Date"
+            label="Invoice Date"
             valueFormat="YYYY-MM-DD"
             {...form.getInputProps("date")}
           />
-          <NumberInput
-            label="Total"
-            hideControls
-            {...form.getInputProps("total")}
+
+          <Textarea
+            label="Notes"
+            placeholder="Optional notes"
+            autosize
+            minRows={2}
+            {...form.getInputProps("notes")}
           />
+
+          <Divider label="Products" mt="sm" mb="xs" />
+
+          {items.map((item, index) => (
+            <Group key={index} grow align="end">
+              <Select
+                label="Product"
+                data={PRODUCT_TYPES}
+                value={item.product}
+                onChange={(value) => {
+                  const price =
+                    PRICE_MAP[value as InvoiceItemInput["product"]] ?? 0;
+                  updateItem(index, {
+                    product: value as any,
+                    unitPrice: price,
+                  });
+                }}
+              />
+              <NumberInput
+                label="Qty"
+                min={1}
+                value={item.quantity}
+                onChange={(val) =>
+                  updateItem(index, {
+                    quantity: typeof val === "number" ? val : 1,
+                  })
+                }
+              />
+              <NumberInput
+                label="Unit Price"
+                value={item.unitPrice}
+                onChange={(val) =>
+                  updateItem(index, {
+                    unitPrice: typeof val === "number" ? val : 0,
+                  })
+                }
+              />
+              <Button color="red" onClick={() => removeItem(index)}>
+                Remove
+              </Button>
+            </Group>
+          ))}
+
+          <Button variant="light" onClick={addItem}>
+            + Add Item
+          </Button>
+
+          <Divider />
+
           <TextInput
-            label="Items (comma-separated)"
-            placeholder="e.g. Hive box, Smoker, Gloves"
-            value={form.values.items?.join(", ") ?? ""}
-            onChange={(e) =>
-              form.setFieldValue(
-                "items",
-                e.currentTarget.value
-                  .split(",")
-                  .map((item) => item.trim())
-                  .filter(Boolean)
-                  .map((desc) => ({
-                    description: desc,
-                    quantity: 1,
-                    unitPrice: 0,
-                  }))
-              )
-            }
+            label="Total"
+            value={`$${calculateTotal().toFixed(2)}`}
+            readOnly
           />
 
           <Group justify="flex-end" mt="md">

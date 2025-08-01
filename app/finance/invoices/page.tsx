@@ -1,6 +1,16 @@
-import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
-import { Button, Card, Group, Table, Text, Title } from "@mantine/core";
+import { auth } from "@clerk/nextjs/server";
+import {
+  Anchor,
+  Badge,
+  Button,
+  Card,
+  Group,
+  ScrollArea,
+  Table,
+  Text,
+  Title,
+} from "@mantine/core";
 import Link from "next/link";
 
 export default async function InvoicePage() {
@@ -16,33 +26,54 @@ export default async function InvoicePage() {
   });
 
   return (
-    <Card withBorder p="lg" shadow="sm">
+    <Card withBorder p="lg" shadow="sm" radius="md">
       <Group justify="space-between" mb="md">
         <Title order={3}>Invoices</Title>
         <Button component={Link} href="/finance/invoices/new">
           New Invoice
         </Button>
       </Group>
-      <Table highlightOnHover withColumnBorders>
-        <thead>
-          <tr>
-            <th>Title</th>
-            <th>Customer</th>
-            <th>Total</th>
-            <th>Date</th>
-          </tr>
-        </thead>
-        <tbody>
-          {invoices.map((invoice) => (
-            <tr key={invoice.id}>
-              <td>{invoice.title}</td>
-              <td>{invoice.customerName}</td>
-              <td>${invoice.total.toFixed(2)}</td>
-              <td>{new Date(invoice.date).toLocaleDateString()}</td>
-            </tr>
-          ))}
-        </tbody>
-      </Table>
+
+      {invoices.length === 0 ? (
+        <Text c="dimmed" ta="center">
+          No invoices yet. Click &quot;New Invoice&quot; to create your first
+          one.
+        </Text>
+      ) : (
+        <ScrollArea h={500} type="auto">
+          <Table highlightOnHover withColumnBorders striped fs={"sm"}>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Customer</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Total</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {invoices.map((invoice) => (
+                <tr key={invoice.id}>
+                  <td>
+                    <Anchor
+                      component={Link}
+                      href={`/finance/invoices/${invoice.id}`}
+                    >
+                      {invoice.id}
+                    </Anchor>
+                  </td>
+                  <td>{invoice.customerName}</td>
+                  <td>{invoice.email || <Badge color="gray">N/A</Badge>}</td>
+                  <td>{invoice.phone || <Badge color="gray">N/A</Badge>}</td>
+                  <td>${invoice.total.toFixed(2)}</td>
+                  <td>{new Date(invoice.date).toLocaleDateString()}</td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
+        </ScrollArea>
+      )}
     </Card>
   );
 }
