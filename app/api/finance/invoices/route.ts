@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { invoiceSchema } from "@/lib/schemas/invoice";
+import { sendInvoiceEmail } from "@/lib/sendInvoiceEmail";
 import { auth } from "@clerk/nextjs/server";
 import { Decimal } from "@prisma/client/runtime/library";
 import { NextRequest, NextResponse } from "next/server";
@@ -46,6 +47,20 @@ export async function POST(req: Request) {
         },
       },
     });
+
+    if (invoice.email) {
+      await sendInvoiceEmail({
+        to: invoice.email,
+        customerName: invoice.customerName,
+        total: invoice.total.toNumber(),
+        date: invoice.date.toISOString().slice(0, 10),
+        description: invoice.notes ?? undefined,
+        items: data.items.map(
+          (item) =>
+            `${item.quantity}x ${item.product} @ $${item.unitPrice.toFixed(2)}`
+        ),
+      });
+    }
 
     return NextResponse.json(invoice, { status: 201 });
   } catch (err) {

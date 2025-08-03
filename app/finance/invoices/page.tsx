@@ -41,8 +41,8 @@ export default async function InvoicePage() {
         </Text>
       ) : (
         <ScrollArea h={500} type="auto">
-          <Table highlightOnHover withColumnBorders striped fs={"sm"}>
-            <thead>
+          <Table striped highlightOnHover withColumnBorders>
+            <thead className="text-left">
               <tr>
                 <th>ID</th>
                 <th>Customer</th>
@@ -66,8 +66,8 @@ export default async function InvoicePage() {
                   <td>{invoice.customerName}</td>
                   <td>{invoice.email || <Badge color="gray">N/A</Badge>}</td>
                   <td>{invoice.phone || <Badge color="gray">N/A</Badge>}</td>
-                  <td>${invoice.total.toFixed(2)}</td>
-                  <td>{new Date(invoice.date).toLocaleDateString()}</td>
+                  <td>{`$${invoice.total.toFixed(2)}`}</td>
+                  <td>{new Date(invoice.date).toISOString().split("T")[0]}</td>
                 </tr>
               ))}
             </tbody>

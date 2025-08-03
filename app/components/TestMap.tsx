@@ -56,7 +56,7 @@ export default function TestMap() {
             <Popup>
               <Card>
                 <Title order={5}>{trap.label}</Title>
-                <p>{new Date(trap.installedAt).toLocaleDateString()}</p>
+                <p>{new Date(trap.installedAt).toISOString().split("T")[0]}</p>
                 {trap.notes && <p>Notes: {trap.notes}</p>}
               </Card>
             </Popup>

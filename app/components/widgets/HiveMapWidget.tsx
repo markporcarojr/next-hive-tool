@@ -125,7 +125,11 @@ export default function HiveMapWidget({
                           <Text size="sm">Todos: {hive.todo}</Text>
                           <Text size="sm">
                             Hive Created:{" "}
-                            {new Date(hive.hiveDate).toLocaleDateString()}
+                            {
+                              new Date(hive.hiveDate)
+                                .toISOString()
+                                .split("T")[0]
+                            }
                           </Text>
                         </Card>
                       </Popup>

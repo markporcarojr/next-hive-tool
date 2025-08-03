@@ -44,7 +44,7 @@ model Hive {
   frames           Int?
   hiveDate         DateTime
   hiveImage        String?
-  hiveNumber       Int?
+  hiveNumber       Int
   hiveSource       String
   hiveStrength     Int?
   id               Int          @id @default(autoincrement())

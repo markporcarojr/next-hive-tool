@@ -88,12 +88,13 @@ export default function SwarmPage() {
             </Text>
 
             <Text size="sm" c="dimmed">
-              Installed: {new Date(trap.installedAt).toLocaleDateString()}
+              Installed:{" "}
+              {new Date(trap.installedAt).toISOString().split("T")[0]}
             </Text>
 
             {trap.removedAt && (
               <Text size="sm" c="dimmed">
-                Removed: {new Date(trap.removedAt).toLocaleDateString()}
+                Removed: {new Date(trap.removedAt).toISOString().split("T")[0]}
               </Text>
             )}
 

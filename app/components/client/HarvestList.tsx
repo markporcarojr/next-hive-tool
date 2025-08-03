@@ -1,11 +1,9 @@
 "use client";
 
-import { InspectionWithHive } from "@/lib/schemas/inspection";
 import {
   Badge,
   Button,
   Card,
-  Divider,
   Group,
   Modal,
   Pagination,
@@ -17,48 +15,42 @@ import { useDisclosure } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { IconX } from "@tabler/icons-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 const ITEMS_PER_PAGE = 4;
 
-export default function InspectionPage() {
-  const [inspections, setInspections] = useState<InspectionWithHive[]>([]);
-  const [inspectionToDelete, setInspectionToDelete] = useState<number | null>(
-    null
-  );
+export default function ClientHarvestList({ harvests }: { harvests: any[] }) {
+  const [activePage, setPage] = useState(1);
   const [modalOpen, { open, close }] = useDisclosure(false);
-  const [page, setPage] = useState(1);
+  const [harvestToDelete, setHarvestToDelete] = useState<number | null>(null);
+  const [localHarvests, setLocalHarvests] = useState(harvests);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const res = await fetch("/api/inspection");
-      const data = await res.json();
-      setInspections(data);
-    };
-    fetchData();
-  }, []);
-
-  const start = (page - 1) * ITEMS_PER_PAGE;
-  const displayed = inspections.slice(start, start + ITEMS_PER_PAGE);
+  const startIndex = (activePage - 1) * ITEMS_PER_PAGE;
+  const displayed = localHarvests.slice(
+    startIndex,
+    startIndex + ITEMS_PER_PAGE
+  );
 
   const handleDelete = async () => {
-    if (!inspectionToDelete) return;
+    if (!harvestToDelete) return;
 
-    const res = await fetch(`/api/inspection?id=${inspectionToDelete}`, {
+    const res = await fetch(`/api/harvest?id=${harvestToDelete}`, {
       method: "DELETE",
     });
 
     if (res.ok) {
-      setInspections((prev) => prev.filter((h) => h.id !== inspectionToDelete));
+      setLocalHarvests((prev) => prev.filter((h) => h.id !== harvestToDelete));
       close();
-      setInspectionToDelete(null);
+      setHarvestToDelete(null);
     } else {
       notifications.show({
         position: "top-center",
         title: "Error",
-        message: "Failed to delete inspection record.",
+        message: "Failed to delete harvest record.",
         color: "red",
         icon: <IconX size={20} />,
+        autoClose: 4000,
+        withCloseButton: true,
       });
     }
   };
@@ -66,14 +58,14 @@ export default function InspectionPage() {
   return (
     <main style={{ padding: "2rem" }}>
       <Group justify="space-between" mb="md">
-        <Title order={2}>Inspection Log</Title>
+        <Title order={2}>Your Harvests</Title>
         <Button
           variant="filled"
           color="#f4b400"
           component={Link}
-          href="/inspection/new"
+          href="/harvest/new"
         >
-          Add Inspection
+          Add Harvest
         </Button>
       </Group>
 
@@ -81,63 +73,55 @@ export default function InspectionPage() {
         {displayed.map((entry) => (
           <Card key={entry.id} shadow="sm" padding="lg" radius="md" withBorder>
             <Group justify="space-between">
-              <Title order={4}>Hive #{entry.hive.hiveNumber}</Title>
-              <Badge>
-                {new Date(entry.inspectionDate).toISOString().split("T")[0]}
+              <Title order={4}>{entry.harvestType}</Title>
+              <Badge color="honey" variant="light">
+                {new Date(entry.harvestDate).toISOString().split("T")[0]}
               </Badge>
-            </Group>
-            <Text size="sm" c="dimmed">
-              Temperament: {entry.temperament}
-            </Text>
-            <Text size="sm" c="dimmed">
-              Hive Strength: {entry.hiveStrength}
-            </Text>
-            <Text size="sm" mt="xs">
-              Notes: {entry.inspectionNote || "No notes provided"}
-            </Text>
-            <Divider my="sm" />
-            <Group justify="space-between">
               <Button
-                size="xs"
                 variant="light"
+                size="xs"
                 component={Link}
-                href={`/inspection/edit/${entry.id}`}
+                href={`/harvest/edit/${entry.id}`}
               >
                 Edit
               </Button>
               <Button
+                color="red"
                 variant="light"
                 size="xs"
-                color="red"
                 onClick={() => {
-                  setInspectionToDelete(entry.id!);
+                  setHarvestToDelete(entry.id!);
                   open();
                 }}
               >
                 Delete
               </Button>
             </Group>
+            <Text>Amount: {entry.harvestAmount} lbs</Text>
           </Card>
         ))}
       </Stack>
 
       <Pagination
         mt="xl"
-        total={Math.ceil(inspections.length / ITEMS_PER_PAGE)}
-        value={page}
+        total={Math.ceil(localHarvests.length / ITEMS_PER_PAGE)}
+        value={activePage}
         onChange={setPage}
         color="honey"
       />
+
       <Modal
         opened={modalOpen}
         onClose={() => {
           close();
-          setInspectionToDelete(null);
+          setHarvestToDelete(null);
         }}
         title="Confirm Deletion"
         centered
       >
-        <Text mb="md">Are you sure you want to delete this record?</Text>
+        <Text mb="md">
+          Are you sure you want to delete this harvest record?
+        </Text>
         <Group justify="flex-end">
           <Button variant="default" onClick={close}>
             Cancel

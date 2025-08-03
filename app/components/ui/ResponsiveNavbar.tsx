@@ -14,17 +14,7 @@ import { useDisclosure } from "@mantine/hooks";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import classes from "./Navbar.module.css";
-
-const links = [
-  { href: "/", label: "Dashboard" },
-  { href: "/hives", label: "Hives" },
-  { href: "/harvest", label: "Harvest" },
-  { href: "/inspection", label: "Inspections" },
-  { href: "/swarm", label: "Swarms" },
-  { href: "/inventory", label: "Inventory" },
-  { href: "/finance", label: "Finance" },
-  { href: "/settings", label: "Settings" },
-];
+import { navLinks } from "@/app/data/navLinks";
 
 export default function ResponsiveNavbar() {
   const [opened, { toggle, close }] = useDisclosure(false);
@@ -76,7 +66,7 @@ export default function ResponsiveNavbar() {
         size="xs"
       >
         <Stack gap="sm" pt={"lg"} style={{ flex: 1 }}>
-          {links.map((link) => {
+          {navLinks.map((link) => {
             const isActive = pathname === link.href;
             return (
               <UnstyledButton

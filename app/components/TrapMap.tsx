@@ -71,7 +71,11 @@ export default function TrapMap({ zoom = 15, height = "400px" }: TrapMapProps) {
                         <Title order={5}>{trap.label || "Unnamed Trap"}</Title>
                         <Text size="sm">
                           Trap Set:{" "}
-                          {new Date(trap.installedAt).toLocaleDateString()}
+                          {
+                            new Date(trap.installedAt)
+                              .toISOString()
+                              .split("T")[0]
+                          }
                         </Text>
                         <Text size="sm" c="dimmed">
                           Label: {trap.label}

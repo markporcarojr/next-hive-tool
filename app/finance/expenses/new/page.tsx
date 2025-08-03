@@ -38,7 +38,7 @@ export default function NewExpensePage() {
       });
 
       if (res.ok) {
-        router.push("/finance");
+        router.push("/finance/expenses");
       } else {
         const error = await res.json();
         alert(error.error || "Something went wrong.");
@@ -64,7 +64,7 @@ export default function NewExpensePage() {
             {...form.getInputProps("item")}
           />
           <NumberInput
-            label="Amount"
+            label="Amount ($)"
             placeholder="Amount"
             min={0}
             step={0.01}
@@ -81,10 +81,10 @@ export default function NewExpensePage() {
             placeholder="Notes"
             {...form.getInputProps("notes")}
           />
+          <Button type="submit" loading={loading} variant="primary">
+            Add Expense
+          </Button>
         </Stack>
-        <Button type="submit" loading={loading} variant="primary">
-          Add Expense
-        </Button>
       </form>
     </Card>
   );

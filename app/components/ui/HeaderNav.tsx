@@ -13,19 +13,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import links from "@data/navLinks"; // Assuming you have a separate file for links
-
-const links = [
-  { href: "/", label: "Dashboard" },
-  { href: "/hives", label: "Hives" },
-  { href: "/harvest", label: "Harvest" },
-  { href: "/inspection", label: "Inspections" },
-  { href: "/swarm", label: "Swarms" },
-  { href: "/inventory", label: "Inventory" },
-  { href: "/finance/", label: "Finance" },
-  { href: "/settings", label: "Settings" },
-];
-
+import { navLinks } from "@/app/data/navLinks"; // Assuming you have a separate file for links
 export default function HeaderNav() {
   const [opened, { toggle, close }] = useDisclosure(false);
   const pathname = usePathname();
@@ -54,7 +42,7 @@ export default function HeaderNav() {
         opened={opened}
         onClose={close}
         title={
-          <Text fw={700} fz="lg" c="black">
+          <Text fw={700} fz="lg" c="white">
             Hive Tool
           </Text>
         }
@@ -68,7 +56,7 @@ export default function HeaderNav() {
         size="xs"
       >
         <Stack gap="sm" pt={"lg"} style={{ flex: 1 }}>
-          {links.map((link) => {
+          {navLinks.map((link) => {
             const isActive = pathname === link.href;
             return (
               <UnstyledButton

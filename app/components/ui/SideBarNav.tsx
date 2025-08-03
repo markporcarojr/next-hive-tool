@@ -13,17 +13,6 @@ import { usePathname } from "next/navigation";
 import classes from "./SideBarNav.module.css";
 import { navLinks } from "../../data/navLinks"; // Assuming you have a separate file for links
 
-const links = [
-  { href: "/", label: "Dashboard" },
-  { href: "/hives", label: "Hives" },
-  { href: "/harvest", label: "Harvest" },
-  { href: "/inspection", label: "Inspections" },
-  { href: "/swarm", label: "Swarms" },
-  { href: "/inventory", label: "Inventory" },
-  { href: "/finance", label: "Finance" },
-  { href: "/settings", label: "Settings" },
-];
-
 export default function SidebarNav() {
   const pathname = usePathname();
 
