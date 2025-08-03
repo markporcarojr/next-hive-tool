@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import { notFound } from "next/navigation";
-import ClientHarvestList from "../components/client/HarvestList";
+import ClientHarvestList from "../../components/client/HarvestList";
 
 export default async function HarvestPage() {
   const { userId: clerkId } = await auth();

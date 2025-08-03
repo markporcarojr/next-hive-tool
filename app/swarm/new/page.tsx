@@ -1,6 +1,6 @@
 "use client";
 
-import MapPicker from "@/app/components/MapPicker";
+import MapPicker from "@/components/MapPicker";
 import { SwarmInput, swarmTrapSchema } from "@/lib/schemas/swarmTrap";
 import {
   Button,

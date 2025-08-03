@@ -1,6 +1,6 @@
 "use client";
 
-import MapPicker from "@/app/components/MapPicker";
+import MapPicker from "@/components/MapPicker";
 import { HiveInput, hiveSchema } from "@/lib/schemas/hive";
 import {
   Button,

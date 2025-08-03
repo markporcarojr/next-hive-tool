@@ -13,7 +13,7 @@ import { useDisclosure } from "@mantine/hooks";
 import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { navLinks } from "@/app/data/navLinks"; // Assuming you have a separate file for links
+import { navLinks } from "@/data/navLinks"; // Assuming you have a separate file for links
 export default function HeaderNav() {
   const [opened, { toggle, close }] = useDisclosure(false);
   const pathname = usePathname();

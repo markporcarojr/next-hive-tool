@@ -49,6 +49,20 @@ export default function DashboardClient({
 
       <Grid gutter="xl">
         <Grid.Col span={{ base: 12, md: 6 }}>
+          <Card shadow="sm" padding="lg" radius="md" withBorder>
+            <Title order={4}>To-Do List</Title>
+            <Divider my="sm" />
+            <Stack>
+              <Checkbox label="Refactor all Widgets" defaultChecked />
+              <Checkbox label="Build a reuseable form" />
+              <Checkbox label="Separate all client and server logic" />
+              <Checkbox label="Organize file structure" />
+              <Checkbox label="Skeletons" />
+              <Checkbox label="Skeletons" />
+            </Stack>
+          </Card>
+        </Grid.Col>
+        <Grid.Col span={{ base: 12, md: 6 }}>
           <FinanceWidget />
         </Grid.Col>
 
@@ -94,19 +108,6 @@ export default function DashboardClient({
         </Grid.Col>
         <Grid.Col span={{ base: 12, md: 6 }}>
           <QuickActionsWidget />
-        </Grid.Col>
-
-        <Grid.Col span={{ base: 12, md: 6 }}>
-          <Card shadow="sm" padding="lg" radius="md" withBorder>
-            <Title order={4}>To-Do List</Title>
-            <Divider my="sm" />
-            <Stack>
-              <Checkbox label="Inspect Hive #12" />
-              <Checkbox label="Harvest honey from Hive #7" />
-              <Checkbox label="Refill smoker fuel" defaultChecked />
-              <Checkbox label="Update queen status" />
-            </Stack>
-          </Card>
         </Grid.Col>
       </Grid>
     </main>

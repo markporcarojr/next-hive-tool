@@ -15,8 +15,8 @@ import "@mantine/notifications/styles.css";
 import { Inter } from "next/font/google";
 import { ReactNode } from "react";
 import "../app/globals.css";
-import SidebarNav from "./components/ui/SideBarNav";
-import HeaderNav from "./components/ui/HeaderNav";
+import SidebarNav from "../components/ui/SideBarNav";
+import HeaderNav from "../components/ui/HeaderNav";
 
 const inter = Inter({ subsets: ["latin"] });
 

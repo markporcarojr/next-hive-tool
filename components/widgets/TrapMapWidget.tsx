@@ -1,7 +1,7 @@
 "use client";
 
-import { honeyIcon } from "@/app/data/mapIcons";
-import { HiveInput } from "@/lib/schemas/hive";
+import { honeyIcon } from "@/data/mapIcons";
+import { SwarmInput } from "@/lib/schemas/swarmTrap";
 import { Card, Text, Title } from "@mantine/core";
 import "leaflet/dist/leaflet.css";
 import { useEffect, useState } from "react";
@@ -12,59 +12,49 @@ import {
   Marker,
   Popup,
   TileLayer,
-  ZoomControl,
 } from "react-leaflet";
 
 const { BaseLayer, Overlay } = LayersControl;
 
-interface MapProps {
+interface TrapMapProps {
   zoom?: number;
   height?: string;
 }
 
-export default function HiveMapWidget({
+export default function TrapMapWidget({
   zoom = 15,
   height = "400px",
-}: MapProps) {
-  const [hives, setHives] = useState<HiveInput[]>([]);
+}: TrapMapProps) {
+  const [traps, setTraps] = useState<SwarmInput[]>([]);
 
   useEffect(() => {
-    const fetchHive = async () => {
+    const fetchTraps = async () => {
       try {
-        const res = await fetch("/api/hives");
+        const res = await fetch("/api/swarm");
         const data = await res.json();
-        setHives(data);
+        setTraps(data);
       } catch (error) {
-        console.error("Error loading hive:", error);
+        console.error("Error loading traps:", error);
       }
     };
-    fetchHive();
+    fetchTraps();
   }, []);
 
-  const validHives = hives.filter(
-    (h) => typeof h.latitude === "number" && typeof h.longitude === "number"
-  );
-
   const center: [number, number] =
-    validHives.length > 0
-      ? [validHives[0].latitude!, validHives[0].longitude!]
+    traps.length > 0
+      ? [traps[0].latitude, traps[0].longitude]
       : [42.78, -83.77];
 
-  if (!hives || hives.length === 0) {
-    return (
-      <Card withBorder shadow="sm" radius="md" p="md" style={{ height }}>
-        <Title order={4} mb="sm">
-          Hive Map
-        </Title>
-        <Text c="dimmed">No hives found. Please add a hive first.</Text>
-      </Card>
-    );
-  }
-
   return (
-    <Card withBorder shadow="sm" radius="md" p="md" style={{ height }}>
+    <Card
+      withBorder
+      shadow="sm"
+      radius="md"
+      p="md"
+      style={{ height, zIndex: 0 }}
+    >
       <Title order={4} mb="sm">
-        Hive Map
+        Swarm Trap Map
       </Title>
       <div
         style={{
@@ -81,8 +71,6 @@ export default function HiveMapWidget({
           scrollWheelZoom={true}
           style={{ height: "100%", width: "100%" }}
         >
-          <ZoomControl position="bottomright" />
-
           <LayersControl position="topright">
             {/* Satellite View */}
             <BaseLayer checked name="Satellite View">
@@ -100,36 +88,31 @@ export default function HiveMapWidget({
                 attribution="© OpenStreetMap contributors"
               />
             </BaseLayer>
-            <Overlay checked name="Swarm hive">
+            <Overlay checked name="Swarm Traps">
               <LayerGroup>
-                {validHives
-                  .filter(
-                    (hive) =>
-                      typeof hive.latitude === "number" &&
-                      typeof hive.longitude === "number"
-                  )
-                  .map((hive) => (
+                {traps &&
+                  traps.length > 0 &&
+                  traps.map((trap) => (
                     <Marker
-                      key={hive.id}
-                      position={[
-                        hive.latitude ?? 42.78,
-                        hive.longitude ?? -83.77,
-                      ]}
+                      key={trap.id}
+                      position={[trap.latitude, trap.longitude]}
                       icon={honeyIcon}
                     >
                       <Popup>
                         <Card shadow="xs" padding="sm">
-                          <Title className="text-center" order={6}>
-                            #{hive.hiveNumber}
+                          <Title order={5}>
+                            {trap.label || "Unnamed Trap"}
                           </Title>
-                          <Text size="sm">Todos: {hive.todo}</Text>
                           <Text size="sm">
-                            Hive Created:{" "}
+                            Trap Set:{" "}
                             {
-                              new Date(hive.hiveDate)
+                              new Date(trap.installedAt)
                                 .toISOString()
                                 .split("T")[0]
                             }
+                          </Text>
+                          <Text size="sm" c="dimmed">
+                            Label: {trap.label}
                           </Text>
                         </Card>
                       </Popup>

@@ -14,7 +14,7 @@ import { useDisclosure } from "@mantine/hooks";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import classes from "./Navbar.module.css";
-import { navLinks } from "@/app/data/navLinks";
+import { navLinks } from "@/data/navLinks";
 
 export default function ResponsiveNavbar() {
   const [opened, { toggle, close }] = useDisclosure(false);

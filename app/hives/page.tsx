@@ -1,7 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { notFound } from "next/navigation";
-import ClientHiveList from "../components/client/HiveList";
+import ClientHiveList from "../../components/client/HiveList";
 import { HiveInput } from "@/lib/schemas/hive";
 
 export default async function HivePage() {

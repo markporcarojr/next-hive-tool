@@ -1,6 +1,6 @@
 import { Resend } from "resend";
 import { renderToBuffer } from "@react-pdf/renderer";
-import InvoicePDF from "@/app/components/InvoicePDF";
+import InvoicePDF from "@/components/InvoicePDF";
 import { formatDateMMDDYYYY } from "./formatDate";
 
 const resend = new Resend(process.env.RESEND_API_KEY);

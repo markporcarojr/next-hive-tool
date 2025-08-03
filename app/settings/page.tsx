@@ -13,7 +13,7 @@ import {
 } from "@mantine/core";
 import { notifications } from "@mantine/notifications";
 import { useEffect, useState } from "react";
-import { ThemeToggle } from "../components/ThemeToggle";
+import { ThemeToggle } from "../../components/ThemeToggle";
 
 export default function SettingsPage() {
   const [darkMode, setDarkMode] = useState(false);

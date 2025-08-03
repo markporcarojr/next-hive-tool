@@ -13,7 +13,7 @@ import {
 } from "@mantine/core";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { ITEM_NAMES } from "../../data/inventoryAutoComplete";
+import { ITEM_NAMES } from "../../../data/inventoryAutoComplete";
 
 const LOCATIONS = ["Storage", "Shop", "Garage", "Field", "Other"];
 
