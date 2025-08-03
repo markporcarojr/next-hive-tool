@@ -53,12 +53,14 @@ export default function DashboardClient({
             <Title order={4}>To-Do List</Title>
             <Divider my="sm" />
             <Stack>
-              <Checkbox label="Refactor all Widgets" defaultChecked />
+              <Checkbox label="Organize file structure" defaultChecked />
+              <Checkbox label="Refactor all Widgets" />
               <Checkbox label="Build a reuseable form" />
               <Checkbox label="Separate all client and server logic" />
-              <Checkbox label="Organize file structure" />
-              <Checkbox label="Skeletons" />
-              <Checkbox label="Skeletons" />
+              <Checkbox label="Make all forms and ui follow the same design" />
+              <Checkbox label="Paganate all pages the same way" />
+              <Checkbox label="Make button components reusable" />
+              <Checkbox label="Update the color palette" />
             </Stack>
           </Card>
         </Grid.Col>
