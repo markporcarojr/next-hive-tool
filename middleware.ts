@@ -1,10 +1,31 @@
-import { clerkMiddleware } from "@clerk/nextjs/server";
+// middleware.ts
+import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
-export default clerkMiddleware();
+// Explicitly define which routes require auth
+const isProtectedRoute = createRouteMatcher([
+  "/(.*)",
+  "/finance(.*)",
+  "/settings(.*)",
+  "/hives(.*)",
+  "/inventory(.*)",
+  "/inspection(.*)",
+  "/swarm(.*)",
+  "/harvest(.*)",
+  "/users(.*)",
+  "/api/(.*)",
+  // Protect all API routes
+  // Add more as needed — don't include / or /sign-in etc.
+]);
+
+export default clerkMiddleware(async (auth, req) => {
+  if (isProtectedRoute(req)) {
+    await auth.protect(); // Redirects to sign-in if unauthenticated
+  }
+});
 
 export const config = {
   matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
+    // Match everything dynamic excluding static files
     "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
     // Always run for API routes
     "/(api|trpc)(.*)",

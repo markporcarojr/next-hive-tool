@@ -37,15 +37,19 @@ export default function FinanceWidget() {
     fetchAllApis();
   }, []);
 
-  const totalIncome = incomes.reduce((sum, i) => sum + Number(i.amount), 0);
-  const totalExpenses = expenses.reduce((sum, e) => sum + Number(e.amount), 0);
-  const totalInvoices = invoices.reduce(
-    (sum, inv) => sum + Number(inv.total),
-    0
-  );
-
+  if (!incomes || !expenses || !invoices) {
+    const totalIncome = incomes.reduce((sum, i) => sum + Number(i.amount), 0);
+    const totalExpenses = expenses.reduce(
+      (sum, e) => sum + Number(e.amount),
+      0
+    );
+    const totalInvoices = invoices.reduce(
+      (sum, inv) => sum + Number(inv.total),
+      0
+    );
+    const totalBalance = totalIncome - totalExpenses + totalInvoices;
+  }
   // If balance = income - expenses - invoices
-  const totalBalance = totalIncome - totalExpenses + totalInvoices;
 
   return (
     <Container>
@@ -58,7 +62,7 @@ export default function FinanceWidget() {
             Total Expenses
           </Text>
           <Title order={3} c="red">
-            ${totalExpenses.toFixed(2)}
+            ${totalExpenses.toFixed(2) || "0.00"}
           </Title>
         </Card>
         <Card withBorder shadow="sm">
@@ -66,7 +70,7 @@ export default function FinanceWidget() {
             Total Income
           </Text>
           <Title order={3} c="blue">
-            ${totalIncome.toFixed(2)}
+            ${totalIncome.toFixed(2) || "0.00"}
           </Title>
         </Card>
         <Card withBorder shadow="sm">
@@ -74,7 +78,7 @@ export default function FinanceWidget() {
             Total Invoices
           </Text>
           <Title order={3} c="yellow">
-            ${totalInvoices.toFixed(2)}
+            ${totalInvoices.toFixed(2) || "0.00"}
           </Title>
         </Card>
         <Card withBorder shadow="sm">
@@ -82,7 +86,7 @@ export default function FinanceWidget() {
             Total Balance
           </Text>
           <Title order={3} c="green">
-            ${totalBalance.toFixed(2)}
+            ${totalBalance.toFixed(2) || "0.00"}
           </Title>
         </Card>
       </SimpleGrid>
