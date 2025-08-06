@@ -1,117 +1,95 @@
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@clerk/nextjs/server";
-import { NextRequest, NextResponse } from "next/server";
 import { inventorySchema } from "@/lib/schemas/inventory";
+import {
+  withAuth,
+  validateSchema,
+  createSuccessResponse,
+  createErrorResponse,
+  logApiError,
+  logApiSuccess,
+} from "@/lib/api-utils";
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const { userId: clerkId } = await auth();
-  if (!clerkId)
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+export const GET = withAuth(
+  async (user, _: NextRequest, { params }: { params: { id: string } }) => {
+    try {
+      const item = await prisma.inventory.findUnique({
+        where: { id: parseInt(params.id), userId: user.id },
+      });
 
-  const user = await prisma.user.findUnique({ where: { clerkId } });
-  if (!user)
-    return NextResponse.json({ message: "User not found" }, { status: 404 });
+      if (!item) {
+        return createErrorResponse("Item not found", 404);
+      }
 
-  const item = await prisma.inventory.findUnique({
-    where: { id: parseInt(params.id), userId: user.id },
-  });
-
-  if (!item) {
-    return NextResponse.json({ message: "Item not found" }, { status: 404 });
+      logApiSuccess("INVENTORY_GET_BY_ID", item);
+      return createSuccessResponse(item);
+    } catch (error) {
+      logApiError("INVENTORY_GET_BY_ID", error);
+      return createErrorResponse("Failed to fetch inventory item");
+    }
   }
+);
 
-  return NextResponse.json(item);
-}
+export const DELETE = withAuth(
+  async (user, _: NextRequest, { params }: { params: { id: string } }) => {
+    try {
+      const item = await prisma.inventory.findUnique({
+        where: { id: parseInt(params.id), userId: user.id },
+      });
 
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const { userId: clerkId } = await auth();
-  if (!clerkId)
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+      if (!item) {
+        return createErrorResponse("Item not found", 404);
+      }
 
-  const user = await prisma.user.findUnique({ where: { clerkId } });
-  if (!user)
-    return NextResponse.json({ message: "User not found" }, { status: 404 });
+      await prisma.inventory.delete({
+        where: { id: item.id },
+      });
 
-  const item = await prisma.inventory.findUnique({
-    where: { id: parseInt(params.id), userId: user.id },
-  });
-
-  if (!item) {
-    return NextResponse.json({ message: "Item not found" }, { status: 404 });
+      logApiSuccess("INVENTORY_DELETE");
+      return createSuccessResponse({ message: "Item deleted successfully" });
+    } catch (error) {
+      logApiError("INVENTORY_DELETE", error);
+      return createErrorResponse("Failed to delete inventory item");
+    }
   }
+);
 
-  await prisma.inventory.delete({
-    where: { id: item.id },
-  });
+export const PUT = withAuth(
+  async (user, req: NextRequest, { params }: { params: { id: string } }) => {
+    try {
+      const body = await req.json();
+      const data = validateSchema(inventorySchema, body);
 
-  return NextResponse.json(
-    { message: "Item deleted successfully" },
-    { status: 200 }
-  );
-}
+      const item = await prisma.inventory.update({
+        where: { id: parseInt(params.id), userId: user.id },
+        data,
+      });
 
-export async function PUT(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const { userId: clerkId } = await auth();
-  if (!clerkId)
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-
-  const user = await prisma.user.findUnique({ where: { clerkId } });
-  if (!user)
-    return NextResponse.json({ message: "User not found" }, { status: 404 });
-
-  const body = await req.json();
-  const parsed = inventorySchema.safeParse(body);
-
-  if (!parsed.success) {
-    return NextResponse.json(
-      { errors: parsed.error.flatten().fieldErrors },
-      { status: 400 }
-    );
+      logApiSuccess("INVENTORY_PUT", item);
+      return createSuccessResponse(item);
+    } catch (error) {
+      logApiError("INVENTORY_PUT", error);
+      return createErrorResponse("Failed to update inventory item");
+    }
   }
+);
 
-  const item = await prisma.inventory.update({
-    where: { id: parseInt(params.id), userId: user.id },
-    data: parsed.data,
-  });
+export const PATCH = withAuth(
+  async (user, req: NextRequest, { params }: { params: { id: string } }) => {
+    try {
+      const body = await req.json();
+      const data = validateSchema(inventorySchema.partial(), body);
 
-  return NextResponse.json(item, { status: 200 });
-}
+      const item = await prisma.inventory.update({
+        where: { id: parseInt(params.id), userId: user.id },
+        data,
+      });
 
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const { userId: clerkId } = await auth();
-  if (!clerkId)
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-
-  const user = await prisma.user.findUnique({ where: { clerkId } });
-  if (!user)
-    return NextResponse.json({ message: "User not found" }, { status: 404 });
-
-  const body = await req.json();
-  const parsed = inventorySchema.partial().safeParse(body);
-
-  if (!parsed.success) {
-    return NextResponse.json(
-      { errors: parsed.error.flatten().fieldErrors },
-      { status: 400 }
-    );
+      logApiSuccess("INVENTORY_PATCH", item);
+      return createSuccessResponse(item);
+    } catch (error) {
+      logApiError("INVENTORY_PATCH", error);
+      return createErrorResponse("Failed to update inventory item");
+    }
   }
-
-  const item = await prisma.inventory.update({
-    where: { id: parseInt(params.id), userId: user.id },
-    data: parsed.data,
-  });
-
-  return NextResponse.json(item, { status: 200 });
-}
+);

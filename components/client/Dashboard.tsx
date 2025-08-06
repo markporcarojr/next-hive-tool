@@ -22,6 +22,7 @@ import {
   YAxis,
 } from "recharts";
 import QuickActionsWidget from "../widgets/QuickActionsWidget";
+import { FinanceSummary } from "@/lib/types/finance";
 
 const TrapMapWidget = dynamic(() => import("../widgets/TrapMapWidget"), {
   ssr: false,
@@ -37,9 +38,11 @@ const chartData = [
 export default function DashboardClient({
   hiveCount,
   swarmTrapCount,
+  financeSummary,
 }: {
   hiveCount: number;
   swarmTrapCount: number;
+  financeSummary: FinanceSummary;
 }) {
   return (
     <main>
@@ -65,7 +68,7 @@ export default function DashboardClient({
           </Card>
         </Grid.Col>
         <Grid.Col span={{ base: 12, md: 6 }}>
-          <FinanceWidget />
+          <FinanceWidget financeSummary={financeSummary} />
         </Grid.Col>
 
         <Grid.Col span={{ base: 12, md: 6 }}>
@@ -85,31 +88,11 @@ export default function DashboardClient({
         </Grid.Col>
 
         <Grid.Col span={{ base: 12, md: 6 }}>
-          <Card shadow="sm" padding="lg" radius="md" withBorder>
-            <SimpleGrid cols={2} spacing="lg">
-              <div>
-                <Text fw={500}>Total Hives</Text>
-                <Title order={3}>{hiveCount}</Title>
-              </div>
-
-              <div>
-                <Text fw={500}>Swarms Traps Set</Text>
-                <Title order={3}>{swarmTrapCount}</Title>
-              </div>
-
-              <div>
-                <Text fw={500}>Some Other Stat Test</Text>
-                <Title order={3}>XXXX</Title>
-              </div>
-            </SimpleGrid>
-          </Card>
-        </Grid.Col>
-
-        <Grid.Col span={{ base: 12, md: 6 }}>
-          <TrapMapWidget />
-        </Grid.Col>
-        <Grid.Col span={{ base: 12, md: 6 }}>
           <QuickActionsWidget />
+        </Grid.Col>
+
+        <Grid.Col span={12}>
+          <TrapMapWidget />
         </Grid.Col>
       </Grid>
     </main>

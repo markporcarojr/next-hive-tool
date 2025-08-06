@@ -1,28 +1,21 @@
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { invoiceSchema } from "@/lib/schemas/invoice";
 import { sendInvoiceEmail } from "@/lib/sendInvoiceEmail";
-import { auth } from "@clerk/nextjs/server";
 import { Decimal } from "@prisma/client/runtime/library";
-import { NextRequest, NextResponse } from "next/server";
+import {
+  withAuth,
+  validateSchema,
+  createSuccessResponse,
+  createErrorResponse,
+  logApiError,
+  logApiSuccess,
+} from "@/lib/api-utils";
 
-export async function POST(req: Request) {
+export const POST = withAuth(async (user, req: NextRequest) => {
   try {
-    const { userId } = await auth();
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     const body = await req.json();
-
-    const parse = invoiceSchema.safeParse(body);
-    if (!parse.success) {
-      return NextResponse.json(
-        { error: "Validation failed", issues: parse.error.format() },
-        { status: 400 }
-      );
-    }
-
-    const data = parse.data;
+    const data = validateSchema(invoiceSchema, body);
 
     const invoice = await prisma.invoice.create({
       data: {
@@ -34,8 +27,7 @@ export async function POST(req: Request) {
         total: new Decimal(data.total),
         user: {
           connect: {
-            // assumes you're using your own User table and linking via Clerk ID
-            clerkId: userId,
+            clerkId: user.clerkId,
           },
         },
         items: {
@@ -62,31 +54,25 @@ export async function POST(req: Request) {
       });
     }
 
-    return NextResponse.json(invoice, { status: 201 });
-  } catch (err) {
-    console.error("[INVOICE_POST_ERROR]", err);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    logApiSuccess("INVOICE_POST", invoice);
+    return createSuccessResponse(invoice, 201);
+  } catch (error) {
+    logApiError("INVOICE_POST", error);
+    return createErrorResponse("Failed to create invoice");
   }
-}
+});
 
-export async function GET(req: NextRequest) {
-  const { userId: clerkId } = await auth();
-  if (!clerkId)
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
+export const GET = withAuth(async (user) => {
   try {
-    const user = await prisma.user.findUnique({ where: { clerkId } });
-    if (!user)
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-
     const invoices = await prisma.invoice.findMany({
       where: { userId: user.id },
       orderBy: { date: "desc" },
     });
 
-    return NextResponse.json(invoices);
+    logApiSuccess("INVOICE_GET", { count: invoices.length });
+    return createSuccessResponse(invoices);
   } catch (error) {
-    console.error("[INVOICE_GET]", error);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    logApiError("INVOICE_GET", error);
+    return createErrorResponse("Failed to fetch invoices");
   }
-}
+});

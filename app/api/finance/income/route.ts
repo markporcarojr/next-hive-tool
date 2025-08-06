@@ -1,42 +1,34 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { incomeSchema } from "@/lib/schemas/income";
+import {
+  withAuth,
+  validateSchema,
+  createSuccessResponse,
+  createErrorResponse,
+  logApiError,
+  logApiSuccess,
+} from "@/lib/api-utils";
 
-export async function GET(req: NextRequest) {
-  const { userId: clerkId } = await auth();
-  if (!clerkId)
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
+export const GET = withAuth(async (user) => {
   try {
-    const user = await prisma.user.findUnique({ where: { clerkId } });
-    if (!user)
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-
     const incomes = await prisma.income.findMany({
       where: { userId: user.id },
       orderBy: { date: "desc" },
     });
 
-    return NextResponse.json(incomes);
+    logApiSuccess("INCOME_GET", { count: incomes.length });
+    return createSuccessResponse(incomes);
   } catch (error) {
-    console.error("[INCOME_GET]", error);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    logApiError("INCOME_GET", error);
+    return createErrorResponse("Failed to fetch income records");
   }
-}
+});
 
-export async function POST(req: NextRequest) {
-  const { userId: clerkId } = await auth();
-  if (!clerkId)
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
+export const POST = withAuth(async (user, req: NextRequest) => {
   try {
     const body = await req.json();
-    const data = incomeSchema.parse(body);
-
-    const user = await prisma.user.findUnique({ where: { clerkId } });
-    if (!user)
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+    const data = validateSchema(incomeSchema, body);
 
     const income = await prisma.income.create({
       data: {
@@ -45,12 +37,10 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return NextResponse.json(income);
+    logApiSuccess("INCOME_POST", income);
+    return createSuccessResponse(income, 201);
   } catch (error) {
-    console.error("[INCOME_POST]", error);
-    return NextResponse.json(
-      { error: "Failed to create income" },
-      { status: 500 }
-    );
+    logApiError("INCOME_POST", error);
+    return createErrorResponse("Failed to create income record");
   }
-}
+});

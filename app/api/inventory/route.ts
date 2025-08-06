@@ -1,68 +1,57 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { inventorySchema } from "@/lib/schemas/inventory";
+import {
+  withAuth,
+  validateSchema,
+  createSuccessResponse,
+  createErrorResponse,
+  logApiError,
+  logApiSuccess,
+} from "@/lib/api-utils";
 
-export async function GET() {
-  const { userId: clerkId } = await auth();
-  if (!clerkId)
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-
-  const user = await prisma.user.findUnique({ where: { clerkId } });
-  if (!user)
-    return NextResponse.json({ message: "User not found" }, { status: 404 });
-
-  const items = await prisma.inventory.findMany({
-    where: { userId: user.id },
-    orderBy: { name: "asc" },
-  });
-
-  return NextResponse.json(items);
-}
-
-export async function POST(req: NextRequest) {
-  const { userId: clerkId } = await auth();
-  if (!clerkId)
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-
-  const user = await prisma.user.findUnique({ where: { clerkId } });
-  if (!user)
-    return NextResponse.json({ message: "User not found" }, { status: 404 });
-
-  const body = await req.json();
-  const parsed = inventorySchema.safeParse(body);
-
-  if (!parsed.success) {
-    return NextResponse.json(
-      { errors: parsed.error.flatten().fieldErrors },
-      { status: 400 }
-    );
-  }
-
-  const item = await prisma.inventory.create({
-    data: {
-      ...parsed.data,
-      userId: user.id,
-    },
-  });
-
-  return NextResponse.json(item, { status: 201 });
-}
-
-export async function DELETE(req: NextRequest) {
-  const { userId: clerkId } = await auth();
-  if (!clerkId)
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-
+export const GET = withAuth(async (user) => {
   try {
-    const user = await prisma.user.findUnique({ where: { clerkId } });
-    if (!user)
-      return NextResponse.json({ message: "User not found" }, { status: 404 });
+    const items = await prisma.inventory.findMany({
+      where: { userId: user.id },
+      orderBy: { name: "asc" },
+    });
 
+    logApiSuccess("INVENTORY_GET", { count: items.length });
+    return createSuccessResponse(items);
+  } catch (error) {
+    logApiError("INVENTORY_GET", error);
+    return createErrorResponse("Failed to fetch inventory items");
+  }
+});
+
+export const POST = withAuth(async (user, req: NextRequest) => {
+  try {
+    const body = await req.json();
+    const data = validateSchema(inventorySchema, body);
+
+    const item = await prisma.inventory.create({
+      data: {
+        ...data,
+        userId: user.id,
+      },
+    });
+
+    logApiSuccess("INVENTORY_POST", item);
+    return createSuccessResponse(item, 201);
+  } catch (error) {
+    logApiError("INVENTORY_POST", error);
+    return createErrorResponse("Failed to create inventory item");
+  }
+});
+
+export const DELETE = withAuth(async (user, req: NextRequest) => {
+  try {
     const url = new URL(req.url);
     const id = url.searchParams.get("id");
+
     if (!id || isNaN(Number(id))) {
-      return NextResponse.json({ message: "Invalid ID" }, { status: 400 });
+      return createErrorResponse("Invalid ID", 400);
     }
 
     const result = await prisma.inventory.deleteMany({
@@ -73,15 +62,15 @@ export async function DELETE(req: NextRequest) {
     });
 
     if (result.count === 0) {
-      return NextResponse.json(
-        { message: "Inventory not found" },
-        { status: 404 }
-      );
+      return createErrorResponse("Inventory item not found", 404);
     }
 
-    return NextResponse.json({ message: "Inventory deleted" });
+    logApiSuccess("INVENTORY_DELETE");
+    return createSuccessResponse({
+      message: "Inventory item deleted successfully",
+    });
   } catch (error) {
-    console.error("[INVENTORY_DELETE]", error);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    logApiError("INVENTORY_DELETE", error);
+    return createErrorResponse("Failed to delete inventory item");
   }
-}
+});

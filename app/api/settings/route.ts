@@ -1,62 +1,66 @@
-import { auth } from "@clerk/nextjs/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { NextRequest, NextResponse } from "next/server";
+import {
+  withAuth,
+  createSuccessResponse,
+  createErrorResponse,
+  logApiError,
+  logApiSuccess,
+} from "@/lib/api-utils";
 
-// GET: Fetch user settings
-export async function GET() {
-  const { userId: clerkId } = await auth();
-  if (!clerkId) return new NextResponse("Unauthorized", { status: 401 });
+export const GET = withAuth(async (user) => {
+  try {
+    const settings = await prisma.settings.findUnique({
+      where: { userId: user.id },
+    });
 
-  const user = await prisma.user.findUnique({ where: { clerkId } });
-  if (!user) return new NextResponse("User not found", { status: 404 });
-
-  const settings = await prisma.settings.findUnique({
-    where: { userId: user.id },
-  });
-
-  return NextResponse.json(settings);
-}
-
-// POST: Create default settings
-export async function POST(req: NextRequest) {
-  const { userId: clerkId } = await auth();
-  if (!clerkId) return new NextResponse("Unauthorized", { status: 401 });
-
-  const user = await prisma.user.findUnique({ where: { clerkId } });
-  if (!user) return new NextResponse("User not found", { status: 404 });
-
-  const existing = await prisma.settings.findUnique({
-    where: { userId: user.id },
-  });
-  if (existing) {
-    return new NextResponse("Settings already exist", { status: 409 });
+    logApiSuccess("SETTINGS_GET", settings);
+    return createSuccessResponse(settings);
+  } catch (error) {
+    logApiError("SETTINGS_GET", error);
+    return createErrorResponse("Failed to fetch settings");
   }
+});
 
-  const data = await req.json();
-  const newSettings = await prisma.settings.create({
-    data: {
-      ...data,
-      userId: user.id,
-    },
-  });
+export const POST = withAuth(async (user, req: NextRequest) => {
+  try {
+    const existing = await prisma.settings.findUnique({
+      where: { userId: user.id },
+    });
 
-  return NextResponse.json(newSettings);
-}
+    if (existing) {
+      return createErrorResponse("Settings already exist", 409);
+    }
 
-// PATCH: Update settings
-export async function PATCH(req: NextRequest) {
-  const { userId: clerkId } = await auth();
-  if (!clerkId) return new NextResponse("Unauthorized", { status: 401 });
+    const data = await req.json();
+    const newSettings = await prisma.settings.create({
+      data: {
+        ...data,
+        userId: user.id,
+      },
+    });
 
-  const user = await prisma.user.findUnique({ where: { clerkId } });
-  if (!user) return new NextResponse("User not found", { status: 404 });
+    logApiSuccess("SETTINGS_POST", newSettings);
+    return createSuccessResponse(newSettings, 201);
+  } catch (error) {
+    logApiError("SETTINGS_POST", error);
+    return createErrorResponse("Failed to create settings");
+  }
+});
 
-  const body = await req.json();
+export const PATCH = withAuth(async (user, req: NextRequest) => {
+  try {
+    const body = await req.json();
 
-  const updated = await prisma.settings.update({
-    where: { userId: user.id },
-    data: body,
-  });
+    const updated = await prisma.settings.update({
+      where: { userId: user.id },
+      data: body,
+    });
 
-  return NextResponse.json(updated);
-}
+    logApiSuccess("SETTINGS_PATCH", updated);
+    return createSuccessResponse(updated);
+  } catch (error) {
+    logApiError("SETTINGS_PATCH", error);
+    return createErrorResponse("Failed to update settings");
+  }
+});

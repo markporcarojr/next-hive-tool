@@ -1,66 +1,34 @@
-import { NextRequest, NextResponse } from "next/server";
-import { auth } from "@clerk/nextjs/server";
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { hiveSchema } from "@/lib/schemas/hive";
+import {
+  withAuth,
+  validateSchema,
+  createSuccessResponse,
+  createErrorResponse,
+  logApiError,
+  logApiSuccess,
+} from "@/lib/api-utils";
 
-// GET: /api/hives
-export async function GET(req: NextRequest) {
-  const { userId: clerkId } = await auth();
-  if (!clerkId)
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
+export const GET = withAuth(async (user) => {
   try {
-    const user = await prisma.user.findUnique({ where: { clerkId } });
-    if (!user)
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-
     const hives = await prisma.hive.findMany({
       where: { userId: user.id },
       orderBy: { hiveDate: "desc" },
     });
 
-    return NextResponse.json(hives);
+    logApiSuccess("HIVES_GET", { count: hives.length });
+    return createSuccessResponse(hives);
   } catch (error) {
-    console.error("[HIVES_GET]", error);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    logApiError("HIVES_GET", error);
+    return createErrorResponse("Failed to fetch hives");
   }
-}
+});
 
-// POST: /api/hives
-export async function POST(req: NextRequest) {
-  const { userId: clerkId } = await auth();
-
-  if (!clerkId) {
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-  }
-
-  const user = await prisma.user.findUnique({
-    where: { clerkId },
-  });
-
-  if (!user) {
-    return NextResponse.json({ message: "User not found" }, { status: 404 });
-  }
-
+export const POST = withAuth(async (user, req: NextRequest) => {
   try {
     const body = await req.json();
-    const parsed = hiveSchema.safeParse(body);
-
-    if (!parsed.success) {
-      return NextResponse.json(
-        { errors: parsed.error.flatten().fieldErrors },
-        { status: 400 }
-      );
-    }
-
-    const data = parsed.data;
-    const user = await prisma.user.findUnique({
-      where: { clerkId },
-    });
-
-    if (!user) {
-      return NextResponse.json({ message: "User not found" }, { status: 404 });
-    }
+    const data = validateSchema(hiveSchema, body);
 
     const existingHive = await prisma.hive.findFirst({
       where: {
@@ -70,9 +38,9 @@ export async function POST(req: NextRequest) {
     });
 
     if (existingHive) {
-      return NextResponse.json(
-        { message: `Hive number ${data.hiveNumber} already exists.` },
-        { status: 409 }
+      return createErrorResponse(
+        `Hive number ${data.hiveNumber} already exists.`,
+        409
       );
     }
 
@@ -84,36 +52,23 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return NextResponse.json(hive, { status: 201 });
+    logApiSuccess("HIVES_POST", hive);
+    return createSuccessResponse(hive, 201);
   } catch (error) {
-    console.error("[HIVE_POST]", error);
-    return NextResponse.json({ message: "Server error" }, { status: 500 });
+    logApiError("HIVES_POST", error);
+    return createErrorResponse("Failed to create hive");
   }
-}
+});
 
-export async function DELETE(req: NextRequest) {
-  const { userId: clerkId } = await auth();
-  if (!clerkId) {
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-  }
-
+export const DELETE = withAuth(async (user, req: NextRequest) => {
   try {
-    const user = await prisma.user.findUnique({
-      where: { clerkId },
-    });
-
-    if (!user) {
-      return NextResponse.json({ message: "User not found" }, { status: 404 });
-    }
-
     const url = new URL(req.url);
     const id = url.searchParams.get("id");
 
     if (!id || isNaN(Number(id))) {
-      return NextResponse.json({ message: "Invalid hive ID" }, { status: 400 });
+      return createErrorResponse("Invalid hive ID", 400);
     }
 
-    // Attempt to delete
     const result = await prisma.hive.deleteMany({
       where: {
         id: Number(id),
@@ -122,12 +77,13 @@ export async function DELETE(req: NextRequest) {
     });
 
     if (result.count === 0) {
-      return NextResponse.json({ message: "Hive not found" }, { status: 404 });
+      return createErrorResponse("Hive not found", 404);
     }
 
-    return NextResponse.json({ message: "Hive deleted successfully" });
+    logApiSuccess("HIVES_DELETE");
+    return createSuccessResponse({ message: "Hive deleted successfully" });
   } catch (error) {
-    console.error("[HIVE_DELETE]", error);
-    return NextResponse.json({ message: "Server error" }, { status: 500 });
+    logApiError("HIVES_DELETE", error);
+    return createErrorResponse("Failed to delete hive");
   }
-}
+});

@@ -1,117 +1,70 @@
-import { NextRequest, NextResponse } from "next/server";
-// import { Harvest } from "@/lib/models/harvest"; // placeholder
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { auth } from "@clerk/nextjs/server";
+import { harvestSchema } from "@/lib/schemas/harvest";
+import {
+  withAuth,
+  validateSchema,
+  createSuccessResponse,
+  createErrorResponse,
+  logApiError,
+  logApiSuccess,
+} from "@/lib/api-utils";
 
-export async function GET(
-  _: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  try {
-    const { id } = params;
+export const GET = withAuth(
+  async (user, _: NextRequest, { params }: { params: { id: string } }) => {
+    try {
+      const harvest = await prisma.harvest.findUnique({
+        where: { id: Number(params.id), userId: user.id },
+      });
 
-    // const harvest = await Harvest.findById(id);
-    const harvest = { id, mock: true };
+      if (!harvest) {
+        return createErrorResponse("Harvest not found", 404);
+      }
 
-    return NextResponse.json(harvest, { status: 200 });
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ message: "Server error" }, { status: 500 });
-  }
-}
-
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  try {
-    const body = await req.json();
-    const { harvestAmount, harvestType, harvestDate } = body;
-
-    if (!harvestAmount || !harvestType || !harvestDate) {
-      return NextResponse.json(
-        { message: "Fill out all required fields" },
-        { status: 400 }
-      );
+      logApiSuccess("HARVEST_GET_BY_ID", harvest);
+      return createSuccessResponse(harvest);
+    } catch (error) {
+      logApiError("HARVEST_GET_BY_ID", error);
+      return createErrorResponse("Failed to fetch harvest record");
     }
-
-    const { id } = params;
-    // const result = await Harvest.findByIdAndUpdate(id, body);
-    const result = { id, updated: true }; // mock
-
-    return NextResponse.json(
-      { message: "Harvest updated successfully", result },
-      { status: 200 }
-    );
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ message: "Server error" }, { status: 500 });
   }
-}
+);
 
-// export async function DELETE(
-//   _: NextRequest,
-//   { params }: { params: { id: string } }
-// ) {
-//   try {
-//     const { id } = params;
+export const PATCH = withAuth(
+  async (user, req: NextRequest, { params }: { params: { id: string } }) => {
+    try {
+      const body = await req.json();
+      const data = validateSchema(harvestSchema, body);
 
-//     const result = await Harvest.findByIdAndDelete(id);
-//     // const result = { id, deleted: true }; // mock
+      const updated = await prisma.harvest.update({
+        where: { id: Number(params.id), userId: user.id },
+        data: {
+          ...data,
+          harvestDate: new Date(data.harvestDate),
+        },
+      });
 
-//     return NextResponse.json(
-//       { message: "Harvest deleted successfully", result },
-//       { status: 200 }
-//     );
-//   } catch (error) {
-//     console.error(error);
-//     return NextResponse.json({ message: "Server error" }, { status: 500 });
-//   }
-// }
-
-export async function DELETE(req: NextRequest) {
-  const { userId: clerkId } = await auth();
-
-  if (!clerkId) {
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+      logApiSuccess("HARVEST_PATCH", updated);
+      return createSuccessResponse(updated);
+    } catch (error) {
+      logApiError("HARVEST_PATCH", error);
+      return createErrorResponse("Failed to update harvest record");
+    }
   }
+);
 
-  try {
-    const user = await prisma.user.findUnique({
-      where: { clerkId },
-    });
+export const DELETE = withAuth(
+  async (user, _: NextRequest, { params }: { params: { id: string } }) => {
+    try {
+      await prisma.harvest.delete({
+        where: { id: Number(params.id), userId: user.id },
+      });
 
-    if (!user) {
-      return NextResponse.json({ message: "User not found" }, { status: 404 });
+      logApiSuccess("HARVEST_DELETE");
+      return createSuccessResponse({ success: true });
+    } catch (error) {
+      logApiError("HARVEST_DELETE", error);
+      return createErrorResponse("Failed to delete harvest record");
     }
-
-    const url = new URL(req.url);
-    const id = url.searchParams.get("id");
-
-    if (!id || isNaN(Number(id))) {
-      return NextResponse.json(
-        { message: "Missing or invalid harvest ID" },
-        { status: 400 }
-      );
-    }
-
-    const harvest = await prisma.harvest.deleteMany({
-      where: {
-        id: Number(id), // <-- convert here
-        userId: user.id,
-      },
-    });
-
-    if (harvest.count === 0) {
-      return NextResponse.json(
-        { message: "Harvest not found" },
-        { status: 404 }
-      );
-    }
-
-    return NextResponse.json({ message: "Harvest deleted successfully" });
-  } catch (error) {
-    console.error("[HARVEST_DELETE]", error);
-    return NextResponse.json({ message: "Server error" }, { status: 500 });
   }
-}
+);

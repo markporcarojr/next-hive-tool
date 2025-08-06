@@ -1,59 +1,34 @@
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { swarmTrapSchema } from "@/lib/schemas/swarmTrap";
-import { auth } from "@clerk/nextjs/server";
-import { NextRequest, NextResponse } from "next/server";
+import {
+  withAuth,
+  validateSchema,
+  createSuccessResponse,
+  createErrorResponse,
+  logApiError,
+  logApiSuccess,
+} from "@/lib/api-utils";
 
-// GET: /api/swarm
-export async function GET(req: NextRequest) {
-  const { userId: clerkId } = await auth();
-  if (!clerkId)
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
+export const GET = withAuth(async (user) => {
   try {
-    const user = await prisma.user.findUnique({ where: { clerkId } });
-    if (!user)
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-
     const swarms = await prisma.swarmTrap.findMany({
       where: { userId: user.id },
       orderBy: { installedAt: "desc" },
     });
 
-    return NextResponse.json(swarms);
+    logApiSuccess("SWARM_GET", { count: swarms.length });
+    return createSuccessResponse(swarms);
   } catch (error) {
-    console.error("[SWARMS_GET]", error);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    logApiError("SWARM_GET", error);
+    return createErrorResponse("Failed to fetch swarm traps");
   }
-}
+});
 
-// POST: /api/swarm
-export async function POST(req: NextRequest) {
-  const { userId: clerkId } = await auth();
-
-  if (!clerkId) {
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-  }
-
-  const body = await req.json();
-  const parsed = swarmTrapSchema.safeParse(body);
-
-  if (!parsed.success) {
-    return NextResponse.json(
-      { errors: parsed.error.flatten().fieldErrors },
-      { status: 400 }
-    );
-  }
-
-  const data = parsed.data;
-
+export const POST = withAuth(async (user, req: NextRequest) => {
   try {
-    const user = await prisma.user.findUnique({
-      where: { clerkId },
-    });
-
-    if (!user) {
-      return NextResponse.json({ message: "User not found" }, { status: 404 });
-    }
+    const body = await req.json();
+    const data = validateSchema(swarmTrapSchema, body);
 
     const swarmTrap = await prisma.swarmTrap.create({
       data: {
@@ -64,27 +39,21 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    return NextResponse.json(swarmTrap, { status: 201 });
+    logApiSuccess("SWARM_POST", swarmTrap);
+    return createSuccessResponse(swarmTrap, 201);
   } catch (error) {
-    console.error("[SWARM_POST]", error);
-    return NextResponse.json({ message: "Server error" }, { status: 500 });
+    logApiError("SWARM_POST", error);
+    return createErrorResponse("Failed to create swarm trap");
   }
-}
+});
 
-export async function DELETE(req: NextRequest) {
-  const { userId: clerkId } = await auth();
-  if (!clerkId)
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-
+export const DELETE = withAuth(async (user, req: NextRequest) => {
   try {
-    const user = await prisma.user.findUnique({ where: { clerkId } });
-    if (!user)
-      return NextResponse.json({ message: "User not found" }, { status: 404 });
-
     const url = new URL(req.url);
     const id = url.searchParams.get("id");
+
     if (!id || isNaN(Number(id))) {
-      return NextResponse.json({ message: "Invalid ID" }, { status: 400 });
+      return createErrorResponse("Invalid ID", 400);
     }
 
     const result = await prisma.swarmTrap.deleteMany({
@@ -95,12 +64,15 @@ export async function DELETE(req: NextRequest) {
     });
 
     if (result.count === 0) {
-      return NextResponse.json({ message: "Swarm not found" }, { status: 404 });
+      return createErrorResponse("Swarm trap not found", 404);
     }
 
-    return NextResponse.json({ message: "Swarm deleted" });
+    logApiSuccess("SWARM_DELETE");
+    return createSuccessResponse({
+      message: "Swarm trap deleted successfully",
+    });
   } catch (error) {
-    console.error("[SWARM_DELETE]", error);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+    logApiError("SWARM_DELETE", error);
+    return createErrorResponse("Failed to delete swarm trap");
   }
-}
+});

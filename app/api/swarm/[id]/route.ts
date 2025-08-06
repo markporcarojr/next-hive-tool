@@ -1,68 +1,51 @@
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { swarmTrapSchema } from "@/lib/schemas/swarmTrap";
-import { auth } from "@clerk/nextjs/server";
-import { NextRequest, NextResponse } from "next/server";
+import {
+  withAuth,
+  validateSchema,
+  createSuccessResponse,
+  createErrorResponse,
+  logApiError,
+  logApiSuccess,
+} from "@/lib/api-utils";
 
-// GET: /api/swarm/[id]
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const { userId: clerkId } = await auth();
-  if (!clerkId)
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+export const GET = withAuth(
+  async (user, _: NextRequest, { params }: { params: { id: string } }) => {
+    try {
+      const swarm = await prisma.swarmTrap.findUnique({
+        where: { id: Number(params.id), userId: user.id },
+      });
 
-  try {
-    const user = await prisma.user.findUnique({ where: { clerkId } });
-    if (!user)
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      if (!swarm) {
+        return createErrorResponse("Swarm trap not found", 404);
+      }
 
-    const swarm = await prisma.swarmTrap.findUnique({
-      where: { id: Number(params.id), userId: user.id },
-    });
-
-    if (!swarm) {
-      return NextResponse.json({ error: "Swarm not found" }, { status: 404 });
+      logApiSuccess("SWARM_GET_BY_ID", swarm);
+      return createSuccessResponse(swarm);
+    } catch (error) {
+      logApiError("SWARM_GET_BY_ID", error);
+      return createErrorResponse("Failed to fetch swarm trap");
     }
-
-    return NextResponse.json(swarm);
-  } catch (error) {
-    console.error("[SWARM_GET]", error);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
-}
+);
 
-// PATCH: /api/swarm?id=123
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const { userId: clerkId } = await auth();
-  if (!clerkId)
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+export const PATCH = withAuth(
+  async (user, req: NextRequest, { params }: { params: { id: string } }) => {
+    try {
+      const body = await req.json();
+      const data = validateSchema(swarmTrapSchema, body);
 
-  try {
-    const user = await prisma.user.findUnique({ where: { clerkId } });
-    if (!user)
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      const updatedSwarm = await prisma.swarmTrap.update({
+        where: { id: Number(params.id), userId: user.id },
+        data,
+      });
 
-    const body = await req.json();
-    const parsedData = swarmTrapSchema.safeParse(body);
-    if (!parsedData.success) {
-      return NextResponse.json(
-        { error: parsedData.error.errors },
-        { status: 400 }
-      );
+      logApiSuccess("SWARM_PATCH", updatedSwarm);
+      return createSuccessResponse(updatedSwarm);
+    } catch (error) {
+      logApiError("SWARM_PATCH", error);
+      return createErrorResponse("Failed to update swarm trap");
     }
-
-    const updatedSwarm = await prisma.swarmTrap.update({
-      where: { id: Number(params.id), userId: user.id },
-      data: parsedData.data,
-    });
-
-    return NextResponse.json(updatedSwarm, { status: 200 });
-  } catch (error) {
-    console.error("[SWARM_PATCH]", error);
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
-}
+);

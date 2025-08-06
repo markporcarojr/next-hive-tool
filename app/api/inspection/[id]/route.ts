@@ -1,113 +1,82 @@
+import { NextRequest } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { inspectionSchema } from "@/lib/schemas/inspection";
-import { auth } from "@clerk/nextjs/server";
-import { NextRequest, NextResponse } from "next/server";
+import {
+  withAuth,
+  validateSchema,
+  createSuccessResponse,
+  createErrorResponse,
+  logApiError,
+  logApiSuccess,
+} from "@/lib/api-utils";
 
-// GET: Fetch all inspections for the current user
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const { userId: clerkId } = await auth();
-  if (!clerkId) {
-    return new NextResponse("Unauthorized", { status: 401 });
-  }
-  try {
-    const user = await prisma.user.findUnique({
-      where: {
-        clerkId,
-      },
-    });
-    if (!user) {
-      return new NextResponse("User not found", { status: 404 });
+export const GET = withAuth(
+  async (user, _: NextRequest, { params }: { params: { id: string } }) => {
+    try {
+      const inspection = await prisma.inspection.findUnique({
+        where: {
+          id: Number(params.id),
+          userId: user.id,
+        },
+        include: {
+          hive: true,
+        },
+      });
+
+      if (!inspection) {
+        return createErrorResponse("Inspection not found", 404);
+      }
+
+      logApiSuccess("INSPECTION_GET_BY_ID", inspection);
+      return createSuccessResponse(inspection);
+    } catch (error) {
+      logApiError("INSPECTION_GET_BY_ID", error);
+      return createErrorResponse("Failed to fetch inspection");
     }
+  }
+);
 
-    const inspection = await prisma.inspection.findUnique({
-      where: {
-        id: Number(params.id),
-        userId: user.id,
-      },
-      include: {
-        hive: true, // Include hive details
-      },
-    });
+export const PATCH = withAuth(
+  async (user, req: NextRequest, { params }: { params: { id: string } }) => {
+    try {
+      const body = await req.json();
+      const data = validateSchema(inspectionSchema, body);
 
-    if (!inspection) {
-      return new NextResponse("Inspection not found", { status: 404 });
+      const updatedInspection = await prisma.inspection.update({
+        where: {
+          id: Number(params.id),
+          userId: user.id,
+        },
+        data: {
+          ...data,
+          inspectionDate: new Date(data.inspectionDate),
+        },
+      });
+
+      logApiSuccess("INSPECTION_PATCH", updatedInspection);
+      return createSuccessResponse(updatedInspection);
+    } catch (error) {
+      logApiError("INSPECTION_PATCH", error);
+      return createErrorResponse("Failed to update inspection");
     }
-
-    return NextResponse.json(inspection);
-  } catch (error) {
-    console.error("[INSPECTION_GET]", error);
-    return new NextResponse("Server error", { status: 500 });
   }
-}
+);
 
-// PATCH: Update an existing inspection
-export async function PATCH(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const { userId: clerkId } = await auth();
-  if (!clerkId) {
-    return new NextResponse("Unauthorized", { status: 401 });
-  }
-  try {
-    const user = await prisma.user.findUnique({ where: { clerkId } });
-    if (!user)
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+export const DELETE = withAuth(
+  async (user, _: NextRequest, { params }: { params: { id: string } }) => {
+    try {
+      const deletedInspection = await prisma.inspection.delete({
+        where: {
+          id: Number(params.id),
+          userId: user.id,
+        },
+      });
 
-    const body = await req.json();
-    const parsedData = inspectionSchema.safeParse(body);
-    if (!parsedData.success) {
-      return NextResponse.json(
-        { error: parsedData.error.errors },
-        { status: 400 }
-      );
+      logApiSuccess("INSPECTION_DELETE", deletedInspection);
+      return createSuccessResponse({ success: true });
+    } catch (error) {
+      logApiError("INSPECTION_DELETE", error);
+      return createErrorResponse("Failed to delete inspection");
     }
-
-    const updatedInspection = await prisma.inspection.update({
-      where: {
-        id: Number(params.id),
-        userId: user.id,
-      },
-      data: {
-        ...parsedData.data,
-        inspectionDate: new Date(parsedData.data.inspectionDate),
-      },
-    });
-
-    return NextResponse.json(updatedInspection, { status: 200 });
-  } catch (error) {
-    console.error("[INSPECTION_PATCH]", error);
-    return new NextResponse("Server error", { status: 500 });
   }
-}
-
-// DELETE: Delete an inspection
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
-  const { userId: clerkId } = await auth();
-  if (!clerkId) {
-    return new NextResponse("Unauthorized", { status: 401 });
-  }
-  try {
-    const user = await prisma.user.findUnique({ where: { clerkId } });
-    if (!user)
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-
-    const deletedInspection = await prisma.inspection.delete({
-      where: {
-        id: Number(params.id),
-        userId: user.id,
-      },
-    });
-
-    return NextResponse.json(deletedInspection, { status: 200 });
-  } catch (error) {
-    console.error("[INSPECTION_DELETE]", error);
-    return new NextResponse("Server error", { status: 500 });
-  }
-}
+);
