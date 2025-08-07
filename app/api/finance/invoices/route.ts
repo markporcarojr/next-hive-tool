@@ -67,6 +67,9 @@ export const GET = withAuth(async (user) => {
     const invoices = await prisma.invoice.findMany({
       where: { userId: user.id },
       orderBy: { date: "desc" },
+      include: {
+        items: true,
+      },
     });
 
     logApiSuccess("INVOICE_GET", { count: invoices.length });

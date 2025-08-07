@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { id } from "zod/v4/locales";
 
 // 1. Literal tuple for enum values
 export const PRODUCT_TYPE_VALUES = [
@@ -36,6 +37,7 @@ export const invoiceItemSchema = z.object({
 
 // 5. Full invoice schema
 export const invoiceSchema = z.object({
+  id: z.string().optional(),
   customerName: z.string().min(1, "Customer name is required"),
   date: z.coerce.date(),
   email: z.string().email("Invalid email format").optional(),

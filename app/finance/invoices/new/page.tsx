@@ -1,5 +1,6 @@
 "use client";
 
+import { showNotification } from "@/lib/notifications";
 import {
   InvoiceInput,
   InvoiceItemInput,
@@ -24,17 +25,16 @@ import { useForm } from "@mantine/form";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { showNotification } from "@/lib/notifications";
 
 const PRICE_MAP: Record<(typeof PRODUCT_TYPE_VALUES)[number], number> = {
   honey: 8,
   "honey bulk": 30,
   "candles small": 5,
   "candles med": 10,
-  "candles lg": 15,
+  "candles lg": 10,
   "morel candle $8": 8,
   "morel candle $10": 10,
-  "honey bundle": 20,
+  "honey bundle": 25,
   misc: 0,
 };
 
