@@ -24,6 +24,7 @@ import { useForm } from "@mantine/form";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { showNotification } from "@/lib/notifications";
 
 const PRICE_MAP: Record<(typeof PRODUCT_TYPE_VALUES)[number], number> = {
   honey: 8,
@@ -93,14 +94,15 @@ export default function NewInvoicePage() {
       });
 
       if (res.ok) {
+        showNotification.success("Invoice created successfully");
         router.push("/finance/invoices");
       } else {
         const error = await res.json();
-        alert(error.error || "Failed to create invoice");
+        showNotification.error(error.error || "Failed to create invoice");
       }
     } catch (err) {
       console.error("[INVOICE_NEW]", err);
-      alert("Unexpected error occurred.");
+      showNotification.error("Unexpected error occurred");
     } finally {
       setLoading(false);
     }
@@ -197,7 +199,14 @@ export default function NewInvoicePage() {
           />
 
           <Group justify="flex-end" mt="md">
-            <Button type="submit" loading={loading}>
+            <Button
+              type="submit"
+              loading={loading}
+              style={{
+                backgroundColor: "var(--color-honey)",
+                color: "var(--color-deep)",
+              }}
+            >
               Save Invoice
             </Button>
           </Group>

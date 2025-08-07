@@ -1,26 +1,31 @@
 // app/inventory/edit/[id]/page.tsx
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { InventoryInput, inventorySchema } from "@/lib/schemas/inventory";
 import {
-  TextInput,
+  Button,
+  Loader,
   NumberInput,
   Select,
-  Button,
   Stack,
+  TextInput,
   Title,
-  Loader,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { zodResolver } from "mantine-form-zod-resolver";
-import { inventorySchema, InventoryInput } from "@/lib/schemas/inventory";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { showNotification } from "@/lib/notifications";
 
 const locations = ["Workshop", "Honey Room", "Storage Shed", "Garage", "Van"];
 
-export default function EditInventoryPage() {
+export default function EditInventoryPage({
+  params,
+}: {
+  params: { id: string };
+}) {
+  const { id } = params;
   const router = useRouter();
-  const { id } = useParams();
   const [loading, setLoading] = useState(true);
 
   const form = useForm<InventoryInput>({
@@ -34,32 +39,49 @@ export default function EditInventoryPage() {
 
   useEffect(() => {
     const fetchInventory = async () => {
-      const res = await fetch(`/api/inventory/${id}`);
-      if (res.ok) {
-        const data = await res.json();
-        form.setValues({
-          name: data.name,
-          quantity: data.quantity,
-          location: data.location,
-        });
+      try {
+        const res = await fetch(`/api/inventory/${id}`);
+        if (res.ok) {
+          const data = await res.json();
+          const current = data.data;
+          console.log("Fetched inventory item:", current);
+          console.log("Available locations:", locations);
+
+          form.setValues({
+            name: current.name,
+            quantity: current.quantity,
+            location: current.location,
+          });
+        } else {
+          showNotification.error("Failed to load inventory item");
+        }
+      } catch {
+        showNotification.error("Failed to load inventory item");
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
 
     if (id) fetchInventory();
-  }, [id]);
+  }, [id, form]);
 
   const handleSubmit = async (values: InventoryInput) => {
-    const res = await fetch(`/api/inventory/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(values),
-    });
+    try {
+      const res = await fetch(`/api/inventory/${id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
 
-    if (res.ok) {
-      router.push("/inventory");
-    } else {
-      alert("Update failed.");
+      if (res.ok) {
+        showNotification.success("Inventory item updated successfully");
+        router.push("/inventory");
+      } else {
+        const error = await res.json();
+        showNotification.error(error.error || "Update failed");
+      }
+    } catch {
+      showNotification.error("Update failed");
     }
   };
 
@@ -86,7 +108,13 @@ export default function EditInventoryPage() {
           {...form.getInputProps("location")}
         />
 
-        <Button type="submit" color="yellow">
+        <Button
+          type="submit"
+          style={{
+            backgroundColor: "var(--color-honey)",
+            color: "var(--color-deep)",
+          }}
+        >
           Update Item
         </Button>
       </Stack>

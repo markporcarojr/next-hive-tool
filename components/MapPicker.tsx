@@ -14,6 +14,7 @@ import {
   useMapEvents,
 } from "react-leaflet";
 import { honeyIcon } from "../data/mapIcons";
+import { showNotification } from "@/lib/notifications";
 
 type MapPickerProps = {
   initialLat?: number;
@@ -63,21 +64,25 @@ export default function MapPicker({
   const handleGeocode = async () => {
     if (!searchQuery) return;
 
-    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
-      searchQuery
-    )}&format=json&limit=1`;
+    try {
+      const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(
+        searchQuery
+      )}&format=json&limit=1`;
 
-    const res = await fetch(url);
-    const data = await res.json();
+      const res = await fetch(url);
+      const data = await res.json();
 
-    if (data && data[0]) {
-      const { lat, lon } = data[0];
-      const newPos = new L.LatLng(parseFloat(lat), parseFloat(lon));
-      setPosition(newPos);
-      onSelect(newPos.lat, newPos.lng);
-      mapRef.current?.setView(newPos, 15);
-    } else {
-      alert("Location not found");
+      if (data && data[0]) {
+        const { lat, lon } = data[0];
+        const newPos = new L.LatLng(parseFloat(lat), parseFloat(lon));
+        setPosition(newPos);
+        onSelect(newPos.lat, newPos.lng);
+        mapRef.current?.setView(newPos, 15);
+      } else {
+        showNotification.warning("Location not found");
+      }
+    } catch {
+      showNotification.error("Failed to search for location");
     }
   };
 
@@ -91,7 +96,7 @@ export default function MapPicker({
         mapRef.current?.setView(newPos, 15);
       },
       () => {
-        alert("Could not access location");
+        showNotification.error("Could not access location");
       }
     );
   };

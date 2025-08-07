@@ -112,7 +112,14 @@ export default function NewSwarmPage() {
           />
 
           <Group justify="flex-end">
-            <Button type="submit" loading={loading} color="yellow">
+            <Button
+              type="submit"
+              loading={loading}
+              style={{
+                backgroundColor: "var(--color-honey)",
+                color: "var(--color-deep)",
+              }}
+            >
               Add Trap
             </Button>
           </Group>

@@ -27,7 +27,7 @@ export default function EditIncomePage() {
         const res = await fetch(`/api/income/${id}`);
         if (!res.ok) throw new Error("Failed to fetch income");
         const data = await res.json();
-        setFormData(data);
+        setFormData(data.data);
       } catch (err) {
         setError("Failed to load income record.");
       } finally {
@@ -94,7 +94,15 @@ export default function EditIncomePage() {
           }
           required
         />
-        <Button mt="md" type="submit" fullWidth>
+        <Button
+          mt="md"
+          type="submit"
+          fullWidth
+          style={{
+            backgroundColor: "var(--color-honey)",
+            color: "var(--color-deep)",
+          }}
+        >
           Update Income
         </Button>
       </form>

@@ -32,7 +32,7 @@ export default function TrapMapWidget({
       try {
         const res = await fetch("/api/swarm");
         const data = await res.json();
-        setTraps(data);
+        setTraps(data.data);
       } catch (error) {
         console.error("Error loading traps:", error);
       }

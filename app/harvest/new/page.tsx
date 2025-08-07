@@ -102,7 +102,14 @@ export default function CreateHarvestPage() {
         />
 
         <Group justify="flex-end" mt="xl">
-          <Button type="submit" leftSection={<IconPlus size={16} />}>
+          <Button
+            type="submit"
+            leftSection={<IconPlus size={16} />}
+            style={{
+              backgroundColor: "var(--color-honey)",
+              color: "var(--color-deep)",
+            }}
+          >
             Add Harvest
           </Button>
         </Group>

@@ -33,7 +33,7 @@ export default function InspectionPage() {
     const fetchData = async () => {
       const res = await fetch("/api/inspection");
       const data = await res.json();
-      setInspections(data);
+      setInspections(data.data);
     };
     fetchData();
   }, []);

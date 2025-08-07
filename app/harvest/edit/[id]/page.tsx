@@ -21,6 +21,8 @@ export default function EditHarvestPage({
 }: {
   params: { id: string };
 }) {
+  const { id } = params;
+
   const router = useRouter();
   const [loading, setLoading] = useState(true);
 
@@ -36,10 +38,14 @@ export default function EditHarvestPage({
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch("/api/harvest");
-        const data = await res.json();
-        const current = data.find((h: any) => h.id === Number(params.id));
-        if (!current) return router.push("/harvest");
+        const res = await fetch(`/api/harvest/${id}`); // ✅ Now you can use `id`
+        const json = await res.json();
+
+        if (!res.ok || !json.data) {
+          throw new Error("Harvest not found");
+        }
+
+        const current = json.data;
 
         form.setValues({
           harvestAmount: current.harvestAmount,
@@ -60,11 +66,11 @@ export default function EditHarvestPage({
     };
 
     fetchData();
-  }, [params.id]);
+  }, [id]);
 
   const handleSubmit = async (values: HarvestInput) => {
     try {
-      const res = await fetch(`/api/harvest?id=${params.id}`, {
+      const res = await fetch(`/api/harvest?id=${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -132,7 +138,15 @@ export default function EditHarvestPage({
         />
 
         <Group justify="flex-end" mt="xl">
-          <Button type="submit">Update</Button>
+          <Button
+            type="submit"
+            style={{
+              backgroundColor: "var(--color-honey)",
+              color: "var(--color-deep)",
+            }}
+          >
+            Update
+          </Button>
         </Group>
       </form>
     </Container>

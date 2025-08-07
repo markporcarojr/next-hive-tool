@@ -33,7 +33,7 @@ export default function HiveMapWidget({
       try {
         const res = await fetch("/api/hives");
         const data = await res.json();
-        setHives(data);
+        setHives(data.data);
       } catch (error) {
         console.error("Error loading hive:", error);
       }

@@ -163,7 +163,14 @@ export default function NewHivePage() {
             {...form.getInputProps("todo")}
           />
           <Group justify="flex-end">
-            <Button type="submit" loading={loading} color="yellow">
+            <Button
+              type="submit"
+              loading={loading}
+              style={{
+                backgroundColor: "var(--color-honey)",
+                color: "var(--color-deep)",
+              }}
+            >
               Save Hive
             </Button>
           </Group>

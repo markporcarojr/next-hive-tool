@@ -10,6 +10,26 @@ import {
   logApiSuccess,
 } from "@/lib/api-utils";
 
+export const GET = withAuth(
+  async (user, _: NextRequest, { params }: { params: { id: string } }) => {
+    try {
+      const expense = await prisma.expense.findUnique({
+        where: { id: Number(params.id), userId: user.id },
+      });
+
+      if (!expense) {
+        return createErrorResponse("Expense not found", 404);
+      }
+
+      logApiSuccess("EXPENSE_GET_BY_ID", expense);
+      return createSuccessResponse(expense);
+    } catch (error) {
+      logApiError("EXPENSE_GET_BY_ID", error);
+      return createErrorResponse("Failed to fetch expense");
+    }
+  }
+);
+
 export const PATCH = withAuth(
   async (user, req: NextRequest, { params }: { params: { id: string } }) => {
     try {

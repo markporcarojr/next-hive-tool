@@ -42,7 +42,7 @@ export default function CreateInspectionPage() {
     const fetchHives = async () => {
       const res = await fetch("/api/hives");
       const data = await res.json();
-      const simplified = data.map((h: any) => ({
+      const simplified = data.data.map((h: any) => ({
         value: String(h.id),
         label: `Hive #${h.hiveNumber}`,
       }));
@@ -54,20 +54,20 @@ export default function CreateInspectionPage() {
 
   const form = useForm<InspectionInput>({
     initialValues: {
-      temperament: "",
-      hiveStrength: 0,
-      hiveId: 0,
-      inspectionDate: new Date(),
-      inspectionImage: "",
-      queen: false,
-      queenCell: false,
       brood: false,
       disease: false,
       eggs: false,
-      pests: "",
       feeding: "",
-      treatments: "",
+      hiveId: 0,
+      hiveStrength: 0,
+      inspectionDate: new Date(),
+      inspectionImage: "",
       inspectionNote: "",
+      pests: "",
+      queen: false,
+      queenCell: false,
+      temperament: "",
+      treatments: "",
       weatherCondition: "",
       weatherTemp: "",
     },
@@ -135,6 +135,7 @@ export default function CreateInspectionPage() {
             label="Select Hive"
             placeholder="Choose a hive"
             data={hives}
+            key={hives.length} // ✅ forces remount when hives update
             {...form.getInputProps("hiveId")}
             required
           />
@@ -239,7 +240,14 @@ export default function CreateInspectionPage() {
           />
 
           <Group justify="flex-end" mt="xl">
-            <Button type="submit" leftSection={<IconPlus size={16} />}>
+            <Button
+              type="submit"
+              leftSection={<IconPlus size={16} />}
+              style={{
+                backgroundColor: "var(--color-honey)",
+                color: "var(--color-deep)",
+              }}
+            >
               Add Inspection
             </Button>
           </Group>

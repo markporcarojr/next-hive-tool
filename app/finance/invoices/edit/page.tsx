@@ -28,7 +28,7 @@ export default function EditInvoicePage() {
         const res = await fetch(`/api/invoice/${id}`);
         if (!res.ok) throw new Error("Failed to fetch invoice");
         const data = await res.json();
-        setFormData(data);
+        setFormData(data.data);
       } catch (err) {
         setError("Failed to load invoice record.");
       } finally {
@@ -109,7 +109,15 @@ export default function EditInvoicePage() {
           value={formData.notes || ""}
           onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
         />
-        <Button mt="md" type="submit" fullWidth>
+        <Button
+          mt="md"
+          type="submit"
+          fullWidth
+          style={{
+            backgroundColor: "var(--color-honey)",
+            color: "var(--color-deep)",
+          }}
+        >
           Update Invoice
         </Button>
       </form>

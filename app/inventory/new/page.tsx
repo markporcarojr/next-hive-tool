@@ -14,8 +14,9 @@ import {
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { ITEM_NAMES } from "../../../data/inventoryAutoComplete";
+import { showNotification } from "@/lib/notifications";
 
-const LOCATIONS = ["Storage", "Shop", "Garage", "Field", "Other"];
+const LOCATIONS = ["Storage Shed", "Shop", "Garage", "Field", "Other"];
 
 // Preset item names (could later be loaded from DB)
 
@@ -27,20 +28,28 @@ export default function NewInventoryPage() {
     validate: zodResolver(inventorySchema),
     initialValues: {
       name: "",
-      quantity: 0,
+      quantity: 1,
       location: "",
     },
   });
 
   const handleSubmit = async (values: InventoryInput) => {
-    const res = await fetch("/api/inventory", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(values),
-    });
+    try {
+      const res = await fetch("/api/inventory", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
 
-    if (res.ok) router.push("/inventory");
-    else alert("Failed to save inventory item");
+      if (res.ok) {
+        showNotification.success("Inventory item added successfully");
+        router.push("/inventory");
+      } else {
+        showNotification.error("Failed to save inventory item");
+      }
+    } catch {
+      showNotification.error("Failed to save inventory item");
+    }
   };
 
   return (
@@ -77,7 +86,13 @@ export default function NewInventoryPage() {
           {...form.getInputProps("location")}
         />
 
-        <Button type="submit" color="yellow">
+        <Button
+          type="submit"
+          style={{
+            backgroundColor: "var(--color-honey)",
+            color: "var(--color-deep)",
+          }}
+        >
           Save Item
         </Button>
       </Stack>

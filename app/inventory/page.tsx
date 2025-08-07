@@ -34,7 +34,7 @@ export default function InventoryPage() {
     const fetchData = async () => {
       const res = await fetch("/api/inventory");
       const data = await res.json();
-      setItems(data);
+      setItems(data.data);
     };
     fetchData();
   }, []);

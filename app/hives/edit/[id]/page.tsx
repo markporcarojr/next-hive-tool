@@ -21,6 +21,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function EditHivesPage({ params }: { params: { id: string } }) {
+  const { id } = params;
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
@@ -42,7 +43,7 @@ export default function EditHivesPage({ params }: { params: { id: string } }) {
       try {
         const res = await fetch("/api/hives");
         const data = await res.json();
-        const current = data.find((h: any) => h.id === Number(params.id));
+        const current = data.data.find((h: any) => h.id === Number(id));
         if (!current) return router.push("/hives");
 
         form.setValues({
@@ -68,12 +69,12 @@ export default function EditHivesPage({ params }: { params: { id: string } }) {
     };
 
     fetchData();
-  }, [params.id]);
+  }, [id]);
 
   const handleSubmit = async (values: HiveInput) => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/hives/${params.id}`, {
+      const res = await fetch(`/api/hives/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -161,7 +162,10 @@ export default function EditHivesPage({ params }: { params: { id: string } }) {
               type="submit"
               leftSection={<IconEdit size={16} />}
               loading={loading}
-              color="yellow"
+              style={{
+                backgroundColor: "var(--color-honey)",
+                color: "var(--color-deep)",
+              }}
             >
               Update Hive
             </Button>

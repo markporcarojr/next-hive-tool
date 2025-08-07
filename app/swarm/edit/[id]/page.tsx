@@ -20,12 +20,13 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function EditSwarmPage({ params }: { params: { id: string } }) {
+  const { id } = params;
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
   const form = useForm<SwarmInput>({
     initialValues: {
-      location: "",
+      label: "",
       latitude: 42.78,
       longitude: -83.77,
       installedAt: new Date(),
@@ -38,7 +39,7 @@ export default function EditSwarmPage({ params }: { params: { id: string } }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch(`/api/swarm/${params.id}`);
+        const res = await fetch(`/api/swarm/${id}`);
         if (!res.ok) throw new Error("Failed to fetch swarm data");
 
         const data = await res.json();
@@ -51,14 +52,16 @@ export default function EditSwarmPage({ params }: { params: { id: string } }) {
           });
           return router.push("/swarm");
         }
-
+        const current = data.data;
         form.setValues({
-          label: data.label,
-          latitude: data.latitude,
-          longitude: data.longitude,
-          installedAt: new Date(data.installedAt),
-          removedAt: data.removedAt ? new Date(data.removedAt) : undefined,
-          notes: data.notes || "",
+          label: current.label,
+          latitude: current.latitude,
+          longitude: current.longitude,
+          installedAt: new Date(current.installedAt),
+          removedAt: current.removedAt
+            ? new Date(current.removedAt)
+            : undefined,
+          notes: current.notes || "",
         });
       } catch (error) {
         notifications.show({
@@ -71,12 +74,12 @@ export default function EditSwarmPage({ params }: { params: { id: string } }) {
     };
 
     fetchData();
-  }, [params.id]);
+  }, [id]);
 
   const onSubmit = async (values: SwarmInput) => {
     setLoading(true);
     try {
-      const res = await fetch(`/api/swarm/${params.id}`, {
+      const res = await fetch(`/api/swarm/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -123,11 +126,7 @@ export default function EditSwarmPage({ params }: { params: { id: string } }) {
       </Title>
       <form onSubmit={form.onSubmit(onSubmit)}>
         <Stack>
-          <TextInput
-            label="Location"
-            required
-            {...form.getInputProps("location")}
-          />
+          <TextInput label="Label" required {...form.getInputProps("label")} />
 
           <NumberInput
             label="Latitude"
@@ -169,7 +168,10 @@ export default function EditSwarmPage({ params }: { params: { id: string } }) {
               type="submit"
               leftSection={<IconEdit size={16} />}
               loading={loading}
-              color="yellow"
+              style={{
+                backgroundColor: "var(--color-honey)",
+                color: "var(--color-deep)",
+              }}
             >
               Update Trap
             </Button>

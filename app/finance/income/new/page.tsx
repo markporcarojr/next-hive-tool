@@ -17,6 +17,7 @@ import {
 } from "@mantine/core";
 
 import { DateInput } from "@mantine/dates";
+import { showNotification } from "@/lib/notifications";
 
 export default function NewIncomePage() {
   const router = useRouter();
@@ -41,14 +42,15 @@ export default function NewIncomePage() {
       });
 
       if (res.ok) {
+        showNotification.success("Income added successfully");
         router.push("/finance/income");
       } else {
         const error = await res.json();
-        alert(error.error || "Something went wrong.");
+        showNotification.error(error.error || "Something went wrong");
       }
     } catch (err) {
       console.error("[INCOME_NEW]", err);
-      alert("Unexpected error occurred.");
+      showNotification.error("Unexpected error occurred");
     } finally {
       setLoading(false);
     }
@@ -88,7 +90,14 @@ export default function NewIncomePage() {
             {...form.getInputProps("notes")}
           />
           <Group mt="md">
-            <Button type="submit" loading={loading}>
+            <Button
+              type="submit"
+              loading={loading}
+              style={{
+                backgroundColor: "var(--color-honey)",
+                color: "var(--color-deep)",
+              }}
+            >
               Submit
             </Button>
 

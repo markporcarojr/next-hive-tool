@@ -2,7 +2,10 @@ import { z } from "zod";
 
 export const inspectionSchema = z.object({
   id: z.coerce.number().int().optional(),
-  hiveId: z.coerce.number().int().min(1),
+  hiveId: z.preprocess(
+    (val) => Number(val),
+    z.number().int().min(1, "Hive is required")
+  ),
   temperament: z.string().min(1),
   hiveStrength: z.number().int().min(0),
   inspectionDate: z.coerce.date(),

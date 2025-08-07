@@ -27,7 +27,7 @@ export default function TestMap() {
     const fetchData = async () => {
       const res = await fetch("/api/swarm");
       const data = await res.json();
-      setTraps(data);
+      setTraps(data.data);
     };
     fetchData();
   }, []);

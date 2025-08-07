@@ -28,7 +28,13 @@ export default function TrapMap({ zoom = 15, height = "400px" }: TrapMapProps) {
   useEffect(() => {
     fetch("/api/swarm")
       .then((res) => res.json())
-      .then(setTraps)
+      .then((json) => {
+        if (json.error) {
+          console.error("API Error:", json.error);
+          return;
+        }
+        setTraps(json.data); // ✅ Use only the data array
+      })
       .catch((err) => console.error("Error loading traps", err));
   }, []);
 

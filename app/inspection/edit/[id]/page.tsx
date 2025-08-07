@@ -19,7 +19,7 @@ import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { IconHeart, IconPlus } from "@tabler/icons-react";
 import { zodResolver } from "mantine-form-zod-resolver";
-import { useParams, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 
 function getStrengthLabel(value: number) {
@@ -34,8 +34,12 @@ function getColor(value: number) {
   return "green";
 }
 
-export default function EditInspectionPage() {
-  const params = useParams();
+export default function EditInspectionPage({
+  params,
+}: {
+  params: { id: string };
+}) {
+  const { id } = params;
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [hives, setHives] = useState<{ value: string; label: string }[]>([]);
@@ -44,7 +48,7 @@ export default function EditInspectionPage() {
     const fetchHives = async () => {
       const res = await fetch("/api/hives");
       const data = await res.json();
-      const simplified = data.map((h: any) => ({
+      const simplified = data.data.map((h: any) => ({
         value: String(h.id),
         label: `Hive #${h.hiveNumber}`,
       }));
@@ -56,21 +60,20 @@ export default function EditInspectionPage() {
 
   const form = useForm<InspectionInput>({
     initialValues: {
-      id: 0,
-      temperament: "",
-      hiveStrength: 0,
+      brood: false,
+      disease: false,
+      eggs: false,
+      feeding: "",
       hiveId: 0,
+      hiveStrength: 0,
       inspectionDate: new Date(),
       inspectionImage: "",
-      queen: undefined,
-      queenCell: undefined,
-      brood: undefined,
-      disease: undefined,
-      eggs: undefined,
-      pests: "",
-      feeding: "",
-      treatments: "",
       inspectionNote: "",
+      pests: "",
+      queen: false,
+      queenCell: false,
+      temperament: "",
+      treatments: "",
       weatherCondition: "",
       weatherTemp: "",
     },
@@ -80,13 +83,15 @@ export default function EditInspectionPage() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetch("/api/inspection");
+        const res = await fetch("/api/inspection/" + id);
         const data = await res.json();
-        const current = data.find((h: any) => h.id === Number(params.id));
+        const current = data.data;
         if (!current) return router.push("/inspection");
 
+        console.log("Current: ", current);
+        console.log("Form: ", form.values);
+
         form.setValues({
-          id: current.id,
           temperament: current.temperament,
           hiveStrength: current.hiveStrength,
           hiveId: current.hiveId,
@@ -117,7 +122,7 @@ export default function EditInspectionPage() {
     };
 
     fetchData();
-  }, [params.id]);
+  }, [id]);
 
   const handleSubmit = async (values: InspectionInput) => {
     const parsed = {
@@ -126,7 +131,7 @@ export default function EditInspectionPage() {
     };
 
     try {
-      const res = await fetch(`/api/inspection/${params.id}`, {
+      const res = await fetch(`/api/inspection/${id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -162,7 +167,6 @@ export default function EditInspectionPage() {
       });
     }
   };
-  console.log("Hives array:", hives);
 
   return (
     <Container size="sm" mt="xl">
@@ -179,9 +183,9 @@ export default function EditInspectionPage() {
           />
           <Select
             label="Select Hive"
-            placeholder="Choose a hive"
             data={hives}
-            {...form.getInputProps("hiveId")}
+            value={String(form.values.hiveId)} // ✅ must be string
+            onChange={(val) => form.setFieldValue("hiveId", Number(val))} // ✅ convert string to number
             required
           />
 
@@ -285,7 +289,14 @@ export default function EditInspectionPage() {
           />
 
           <Group justify="flex-end" mt="xl">
-            <Button type="submit" leftSection={<IconPlus size={16} />}>
+            <Button
+              type="submit"
+              leftSection={<IconPlus size={16} />}
+              style={{
+                backgroundColor: "var(--color-honey)",
+                color: "var(--color-deep)",
+              }}
+            >
               Update Inspection
             </Button>
           </Group>

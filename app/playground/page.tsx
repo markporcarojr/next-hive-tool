@@ -89,7 +89,13 @@ export default function SwarmTrapForm({ initialValues, onSubmit }: Props) {
         />
 
         <Group justify="flex-end">
-          <Button type="submit" color="yellow">
+          <Button
+            type="submit"
+            style={{
+              backgroundColor: "var(--color-honey)",
+              color: "var(--color-deep)",
+            }}
+          >
             Save Trap
           </Button>
         </Group>

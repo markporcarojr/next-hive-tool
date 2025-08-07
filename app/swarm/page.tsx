@@ -31,13 +31,13 @@ export default function SwarmPage() {
     const fetchSwarms = async () => {
       const res = await fetch("/api/swarm");
       const data = await res.json();
-      setSwarms(data);
+      setSwarms(data.data); // ✅ just the array
     };
     fetchSwarms();
   }, []);
 
   const startIndex = (page - 1) * ITEMS_PER_PAGE;
-  const displayed = swarms.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  const displayed = swarms.slice(startIndex, startIndex + ITEMS_PER_PAGE); // ✅ now this works
 
   const handleDelete = async () => {
     if (!swarmToDelete) return;
