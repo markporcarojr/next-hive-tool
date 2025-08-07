@@ -1,4 +1,3 @@
-// components/finance/InvoicesList.tsx
 "use client";
 
 import { showNotification } from "@/lib/notifications";
@@ -18,34 +17,34 @@ import { IconEdit, IconTrash } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Link from "next/link";
-import { InvoiceInput } from "@/lib/schemas/invoice";
 
-// interface Invoice {
-//   id: number;
-//   customerName: string;
-//   email?: string;
-//   phone?: string;
-//   total: number;
-//   date: string;
-// }
+// More accurate than InvoiceInput (which doesn’t include `id`)
+interface InvoiceSummary {
+  id: number;
+  customerName: string;
+  email?: string;
+  phone?: string;
+  total: number;
+  date: string | Date;
+}
 
 interface InvoicesListProps {
-  invoices: InvoiceInput[];
+  invoices: InvoiceSummary[];
 }
 
 export default function InvoicesList({ invoices }: InvoicesListProps) {
   const router = useRouter();
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [invoiceToDelete, setInvoiceToDelete] = useState<InvoiceInput | null>(
+  const [invoiceToDelete, setInvoiceToDelete] = useState<InvoiceSummary | null>(
     null
   );
   const [deleting, setDeleting] = useState(false);
 
-  const handleEdit = (invoice: InvoiceInput) => {
+  const handleEdit = (invoice: InvoiceSummary) => {
     router.push(`/finance/invoices/edit/${invoice.id}`);
   };
 
-  const handleDeleteClick = (invoice: InvoiceInput) => {
+  const handleDeleteClick = (invoice: InvoiceSummary) => {
     setInvoiceToDelete(invoice);
     setDeleteModalOpen(true);
   };
@@ -84,7 +83,7 @@ export default function InvoicesList({ invoices }: InvoicesListProps) {
     <>
       <ScrollArea h={500} type="auto">
         <Table striped highlightOnHover withColumnBorders>
-          <thead className="text-left">
+          <thead>
             <tr>
               <th>ID</th>
               <th>Customer</th>
@@ -110,7 +109,11 @@ export default function InvoicesList({ invoices }: InvoicesListProps) {
                 <td>{invoice.email || <Badge color="gray">N/A</Badge>}</td>
                 <td>{invoice.phone || <Badge color="gray">N/A</Badge>}</td>
                 <td>{`$${invoice.total.toFixed(2)}`}</td>
-                <td>{new Date(invoice.date).toISOString().split("T")[0]}</td>
+                <td>
+                  {typeof invoice.date === "string"
+                    ? invoice.date.split("T")[0]
+                    : new Date(invoice.date).toISOString().split("T")[0]}
+                </td>
                 <td>
                   <Group gap="xs" justify="center">
                     <ActionIcon

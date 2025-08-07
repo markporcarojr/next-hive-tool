@@ -110,7 +110,7 @@ export const DELETE = withAuth(
       return createSuccessResponse({ success: true });
     } catch (error) {
       logApiError("INVOICE_DELETE", error);
-      return createErrorResponse("Failed to delete invoice");
+      return createErrorResponse("Failed to delete invoice record");
     }
   }
 );
