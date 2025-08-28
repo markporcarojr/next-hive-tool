@@ -8,32 +8,15 @@ import {
   UserButton,
 } from "@clerk/nextjs";
 import { Group } from "@mantine/core";
-import {
-  IconArchive,
-  IconLayoutDashboard,
-  IconListCheck,
-  IconSeedling,
-  IconSettings,
-  IconTool,
-  IconWind,
-} from "@tabler/icons-react";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import classes from "./Navbar.module.css";
 import { navLinks } from "../../data/navLinks";
-
-const data = [
-  { link: "/", label: "Dashboard", icon: IconLayoutDashboard },
-  { link: "/hives", label: "Hives", icon: IconArchive },
-  { link: "/harvest", label: "Harvest", icon: IconSeedling },
-  { link: "/inspection", label: "Inspections", icon: IconListCheck },
-  { link: "/swarm", label: "Swarms", icon: IconWind },
-  { link: "/inventory", label: "Inventory", icon: IconTool },
-  { link: "/settings", label: "Settings", icon: IconSettings },
-];
+import classes from "./Navbar.module.css";
+import { checkUser } from "@/lib/auth/checkUser";
 
 export default function Navbar() {
+  const { user } = checkUser();
   const pathname = usePathname();
 
   return (

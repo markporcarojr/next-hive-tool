@@ -11,7 +11,7 @@ export const checkUser = async () => {
   // Check if user already exists in DB
   const existingUser = await prisma.user.findUnique({
     where: {
-      id: user.id,
+      clerkId: user.id,
     },
   });
 
@@ -21,8 +21,10 @@ export const checkUser = async () => {
   // Otherwise, create and return new user
   const newUser = await prisma.user.create({
     data: {
-      id: user.id,
-      email: user.emailAddresses[0].emailAddress,
+      clerkId: user.id,
+      name: `${user.firstName} ${user.lastName} `,
+      // imageUrl : user.imageUrl,
+      email: user.emailAddresses[0]?.emailAddress,
     },
   });
 
