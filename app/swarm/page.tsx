@@ -37,7 +37,9 @@ export default function SwarmPage() {
   }, []);
 
   const startIndex = (page - 1) * ITEMS_PER_PAGE;
-  const displayed = swarms.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  const displayed = swarms.length
+    ? swarms.slice(startIndex, startIndex + ITEMS_PER_PAGE)
+    : [];
 
   const handleDelete = async () => {
     if (!swarmToDelete) return;

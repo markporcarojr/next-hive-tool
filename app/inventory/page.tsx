@@ -39,16 +39,38 @@ export default function InventoryPage() {
     fetchData();
   }, []);
 
-  const filteredItems = selectedLocation
-    ? items.filter((item) => item.location === selectedLocation)
-    : items;
+  // Check if items data is loaded
+  if (!items || items.length === 0) {
+    return (
+      <main style={{ padding: "2rem" }}>
+        <Title order={2}>Inventory</Title>
+        <Text mt="md">No inventory data found.</Text>
+      </main>
+    );
+  }
 
-  const start = (page - 1) * ITEMS_PER_PAGE;
-  const displayed = filteredItems.slice(start, start + ITEMS_PER_PAGE);
+  const filteredItems =
+    items && items.length > 0
+      ? selectedLocation
+        ? items.filter((item) => item.location === selectedLocation)
+        : items
+      : [];
 
-  const uniqueLocations = Array.from(
-    new Set(items.map((item) => item.location))
-  ).map((loc) => ({ label: loc, value: loc }));
+  // Ensure filteredItems has data before calculating start
+  const start =
+    filteredItems && filteredItems.length > 0 ? (page - 1) * ITEMS_PER_PAGE : 0;
+  const displayed =
+    filteredItems && filteredItems.length > 0
+      ? filteredItems.slice(start, start + ITEMS_PER_PAGE)
+      : [];
+
+  const uniqueLocations =
+    items && items.length > 0
+      ? Array.from(new Set(items.map((item) => item.location))).map((loc) => ({
+          label: loc,
+          value: loc,
+        }))
+      : [];
 
   const handleDelete = async () => {
     if (!inventoryToDelete) return;

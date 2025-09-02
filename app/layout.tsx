@@ -1,10 +1,6 @@
 // app/layout.tsx
 import { ClerkProvider } from "@clerk/nextjs";
 import {
-  AppShell,
-  AppShellHeader,
-  AppShellNavbar,
-  AppShellMain,
   ColorSchemeScript,
   MantineProvider,
   mantineHtmlProps,
@@ -13,10 +9,11 @@ import "@mantine/core/styles.css";
 import { Notifications } from "@mantine/notifications";
 import "@mantine/notifications/styles.css";
 import { Inter } from "next/font/google";
+import { headers } from "next/headers";
 import { ReactNode } from "react";
 import "../app/globals.css";
-import SidebarNav from "../components/ui/SideBarNav";
-import HeaderNav from "../components/ui/HeaderNav";
+import { checkUser } from "@/lib/auth/checkUser";
+import ClientLayoutShell from "@/components/layout/ClientLayoutShell";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -25,7 +22,14 @@ export const metadata = {
   description: "A beekeeping companion app",
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  await checkUser();
+  const pathname = (await headers()).get("x-pathname") || "/";
+
   return (
     <ClerkProvider>
       <html lang="en" {...mantineHtmlProps} className={inter.className}>
@@ -55,33 +59,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             }}
           >
             <Notifications position="top-right" />
-
-            <AppShell
-              padding={{ base: 16, sm: 24, md: 32 }}
-              navbar={{
-                width: 250,
-                breakpoint: "sm",
-                collapsed: { mobile: true, desktop: false },
-              }}
-              withBorder={false}
-              header={{
-                height: { base: 64, sm: 0 }, // 64px on mobile, 0 on desktop
-                collapsed: false,
-              }}
-            >
-              {/* Desktop Header */}
-              <AppShellHeader hiddenFrom="sm">
-                <HeaderNav />
-              </AppShellHeader>
-
-              {/* Desktop Sidebar */}
-              <AppShellNavbar visibleFrom="sm">
-                <SidebarNav />
-              </AppShellNavbar>
-
-              {/* Main content with custom mobile padding */}
-              <AppShellMain>{children}</AppShellMain>
-            </AppShell>
+            <ClientLayoutShell pathname={pathname}>
+              {children}
+            </ClientLayoutShell>
           </MantineProvider>
         </body>
       </html>

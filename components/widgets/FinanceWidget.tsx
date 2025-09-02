@@ -37,18 +37,16 @@ export default function FinanceWidget() {
     fetchAllApis();
   }, []);
 
-  if (!incomes || !expenses || !invoices) {
-    const totalIncome = incomes.reduce((sum, i) => sum + Number(i.amount), 0);
-    const totalExpenses = expenses.reduce(
-      (sum, e) => sum + Number(e.amount),
-      0
-    );
-    const totalInvoices = invoices.reduce(
-      (sum, inv) => sum + Number(inv.total),
-      0
-    );
-    const totalBalance = totalIncome - totalExpenses + totalInvoices;
-  }
+  const totalIncome = incomes?.length
+    ? incomes.reduce((sum, i) => sum + Number(i.amount), 0)
+    : 0;
+  const totalExpenses = expenses?.length
+    ? expenses.reduce((sum, e) => sum + Number(e.amount), 0)
+    : 0;
+  const totalInvoices = invoices?.length
+    ? invoices.reduce((sum, inv) => sum + Number(inv.total), 0)
+    : 0;
+  const totalBalance = totalIncome - totalExpenses + totalInvoices;
   // If balance = income - expenses - invoices
 
   return (

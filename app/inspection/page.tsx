@@ -39,7 +39,10 @@ export default function InspectionPage() {
   }, []);
 
   const start = (page - 1) * ITEMS_PER_PAGE;
-  const displayed = inspections.slice(start, start + ITEMS_PER_PAGE);
+  const displayed =
+    inspections && inspections.length > 0
+      ? inspections.slice(start, start + ITEMS_PER_PAGE)
+      : [];
 
   const handleDelete = async () => {
     if (!inspectionToDelete) return;

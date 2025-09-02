@@ -1,23 +1,25 @@
-"use client";
-
+// components/ui/HeaderNav.tsx
 import {
-  Burger,
-  Group,
-  Text,
   Box,
+  Burger,
   Drawer,
+  Group,
   Stack,
+  Text,
   UnstyledButton,
 } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
+import { navLinks } from "@/data/navLinks";
 import { UserButton } from "@clerk/nextjs";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { navLinks } from "@/data/navLinks"; // Assuming you have a separate file for links
-export default function HeaderNav() {
-  const [opened, { toggle, close }] = useDisclosure(false);
-  const pathname = usePathname();
 
+type Props = {
+  pathname: string;
+  opened: boolean;
+  toggle: () => void;
+  close: () => void;
+};
+
+export default function HeaderNav({ pathname, opened, toggle, close }: Props) {
   return (
     <Box
       hiddenFrom="sm"
@@ -38,6 +40,7 @@ export default function HeaderNav() {
         </Text>
         <UserButton />
       </Group>
+
       <Drawer
         opened={opened}
         onClose={close}
@@ -55,7 +58,7 @@ export default function HeaderNav() {
         radius="md"
         size="xs"
       >
-        <Stack gap="sm" pt={"lg"} style={{ flex: 1 }}>
+        <Stack gap="sm" pt="lg" style={{ flex: 1 }}>
           {navLinks.map((link) => {
             const isActive = pathname === link.href;
             return (
@@ -92,6 +95,7 @@ export default function HeaderNav() {
             );
           })}
         </Stack>
+
         <Box
           mt="xl"
           style={{

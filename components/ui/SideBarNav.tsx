@@ -1,21 +1,21 @@
-"use client";
-
+// app/components/SidebarNav.tsx
 import {
-  SignedOut,
   SignedIn,
-  UserButton,
+  SignedOut,
   SignInButton,
   SignUpButton,
+  UserButton,
 } from "@clerk/nextjs";
 import { Box, Group, Text } from "@mantine/core";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { navLinks } from "../../data/navLinks"; // or "@/data/navLinks"
 import classes from "./SideBarNav.module.css";
-import { navLinks } from "../../data/navLinks"; // Assuming you have a separate file for links
 
-export default function SidebarNav() {
-  const pathname = usePathname();
+type SidebarNavProps = {
+  pathname: string;
+};
 
+export default async function SidebarNav({ pathname }: SidebarNavProps) {
   return (
     <Box visibleFrom="sm">
       <nav className={classes.navbar}>
