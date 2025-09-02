@@ -1,6 +1,12 @@
 // app/layout.tsx
+import { headers } from "next/headers";
+import { checkUser } from "@/lib/auth/checkUser";
 import { ClerkProvider } from "@clerk/nextjs";
 import {
+  AppShell,
+  AppShellHeader,
+  AppShellMain,
+  AppShellNavbar,
   ColorSchemeScript,
   MantineProvider,
   mantineHtmlProps,
@@ -9,11 +15,10 @@ import "@mantine/core/styles.css";
 import { Notifications } from "@mantine/notifications";
 import "@mantine/notifications/styles.css";
 import { Inter } from "next/font/google";
-import { headers } from "next/headers";
 import { ReactNode } from "react";
 import "../app/globals.css";
-import { checkUser } from "@/lib/auth/checkUser";
-import ClientLayoutShell from "@/components/layout/ClientLayoutShell";
+import HeaderNavWrapper from "@/components/layout/HeaderNavWrapper";
+import SidebarNav from "@/components/ui/SideBarNav";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -28,7 +33,10 @@ export default async function RootLayout({
   children: ReactNode;
 }) {
   await checkUser();
-  const pathname = (await headers()).get("x-pathname") || "/";
+
+  const headersList = await headers();
+  const pathname = new URL(headersList.get("x-url") || "http://localhost")
+    .pathname;
 
   return (
     <ClerkProvider>
@@ -59,9 +67,31 @@ export default async function RootLayout({
             }}
           >
             <Notifications position="top-right" />
-            <ClientLayoutShell pathname={pathname}>
-              {children}
-            </ClientLayoutShell>
+            <AppShell
+              padding={{ base: 16, sm: 24, md: 32 }}
+              navbar={{
+                width: 250,
+                breakpoint: "sm",
+                collapsed: { mobile: true, desktop: false },
+              }}
+              withBorder={false}
+              header={{
+                height: { base: 64, sm: 0 },
+                collapsed: false,
+              }}
+            >
+              {/* Mobile Header */}
+              <AppShellHeader hiddenFrom="sm">
+                <HeaderNavWrapper pathname={pathname} />
+              </AppShellHeader>
+
+              {/* Desktop Sidebar */}
+              <AppShellNavbar visibleFrom="sm">
+                <SidebarNav pathname={pathname} />
+              </AppShellNavbar>
+
+              <AppShellMain>{children}</AppShellMain>
+            </AppShell>
           </MantineProvider>
         </body>
       </html>

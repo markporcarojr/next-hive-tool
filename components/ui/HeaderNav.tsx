@@ -60,7 +60,8 @@ export default function HeaderNav({ pathname, opened, toggle, close }: Props) {
       >
         <Stack gap="sm" pt="lg" style={{ flex: 1 }}>
           {navLinks.map((link) => {
-            const isActive = pathname === link.href;
+            const isActive = pathname.startsWith(link.href);
+
             return (
               <UnstyledButton
                 component={Link}

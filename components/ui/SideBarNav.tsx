@@ -1,4 +1,6 @@
 // app/components/SidebarNav.tsx
+"use client";
+
 import {
   SignedIn,
   SignedOut,
@@ -6,16 +8,12 @@ import {
   SignUpButton,
   UserButton,
 } from "@clerk/nextjs";
+
 import { Box, Group, Text } from "@mantine/core";
-import Link from "next/link";
-import { navLinks } from "../../data/navLinks"; // or "@/data/navLinks"
+import { Links } from "./Navlinks"; // Adjust path if needed
 import classes from "./SideBarNav.module.css";
 
-type SidebarNavProps = {
-  pathname: string;
-};
-
-export default async function SidebarNav({ pathname }: SidebarNavProps) {
+export default function SidebarNav() {
   return (
     <Box visibleFrom="sm">
       <nav className={classes.navbar}>
@@ -26,30 +24,24 @@ export default async function SidebarNav({ pathname }: SidebarNavProps) {
               <UserButton />
             </SignedIn>
           </Group>
-          <div className="flex items-center gap-4">
+
+          <div className="flex items-center gap-4 mb-4">
             <SignedOut>
               <SignInButton />
               <SignUpButton />
             </SignedOut>
           </div>
-          {navLinks.map((link) => (
-            <Link
-              href={link.href}
-              key={link.label}
-              className={classes.link}
-              data-active={pathname === link.href || undefined}
-            >
-              <span>{link.label}</span>
-            </Link>
-          ))}
+
+          <Links
+            linkClassName={classes.link}
+            activeClassName="active" // or pass a class like classes.active if you have one
+          />
         </div>
+
         <div className={classes.footer}>
-          <div className={classes.copywright}>
-            <span className="text-black-500 dark:text-gray-400 text-sm flex items-center gap-2">
-              © {new Date().getFullYear()} Hive Tool. All rights reserved. |
-              v1.0
-            </span>
-          </div>
+          <span className="text-black-500 dark:text-gray-400 text-sm flex items-center gap-2">
+            © {new Date().getFullYear()} Hive Tool. All rights reserved. | v1.0
+          </span>
         </div>
       </nav>
     </Box>
