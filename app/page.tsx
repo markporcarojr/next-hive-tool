@@ -1,10 +1,12 @@
 // app/page.tsx (Server Component)
-import { prisma } from "@/lib/prisma";
+// Temporary mock data for UI testing - will restore Prisma after migration
+// import { prisma } from "@/lib/prisma";
 import DashboardClient from "../components/client/Dashboard";
 
 export default async function HomePage() {
-  const hiveCount = await prisma.hive.count();
-  const swarmTrapCount = await prisma.swarmTrap.count();
+  // Mock data for testing layout changes
+  const hiveCount = 12;
+  const swarmTrapCount = 5;
 
   return (
     <DashboardClient hiveCount={hiveCount} swarmTrapCount={swarmTrapCount} />

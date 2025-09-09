@@ -1,6 +1,13 @@
 "use client";
 
-import { Card, Group, Select, Title } from "@mantine/core";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { useRouter } from "next/navigation";
 
 const QuickActionsWidget = () => {
@@ -32,20 +39,13 @@ const QuickActionsWidget = () => {
   };
 
   return (
-    <Card shadow="sm" padding="lg" radius="md" withBorder>
-      <Title order={4}>Quick Actions</Title>
-      <Group mt="md">
+    <Card>
+      <CardHeader>
+        <CardTitle>Quick Actions</CardTitle>
+      </CardHeader>
+      <CardContent>
         <Select
-          placeholder="Select action"
-          data={[
-            { value: "inspection", label: "Add Inspection" },
-            { value: "hive", label: "Add Hive" },
-            { value: "swarm", label: "Add Swarm" },
-            { value: "harvest", label: "Add Harvest" },
-            { value: "inventory", label: "Add Inventory" },
-            { value: "settings", label: "Settings" },
-          ]}
-          onChange={(value) => {
+          onValueChange={(value) => {
             if (value === "inspection") handleAddInspection();
             else if (value === "hive") handleAddHive();
             else if (value === "swarm") handleAddSwarm();
@@ -53,8 +53,20 @@ const QuickActionsWidget = () => {
             else if (value === "inventory") handleAddInventory();
             else if (value === "settings") handleSettings();
           }}
-        />
-      </Group>
+        >
+          <SelectTrigger className="w-full">
+            <SelectValue placeholder="Select action" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="inspection">Add Inspection</SelectItem>
+            <SelectItem value="hive">Add Hive</SelectItem>
+            <SelectItem value="swarm">Add Swarm</SelectItem>
+            <SelectItem value="harvest">Add Harvest</SelectItem>
+            <SelectItem value="inventory">Add Inventory</SelectItem>
+            <SelectItem value="settings">Settings</SelectItem>
+          </SelectContent>
+        </Select>
+      </CardContent>
     </Card>
   );
 };
