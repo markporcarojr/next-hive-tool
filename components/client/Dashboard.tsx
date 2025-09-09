@@ -2,16 +2,9 @@
 "use client";
 
 import FinanceWidget from "../widgets/FinanceWidget";
-import {
-  Card,
-  Checkbox,
-  Divider,
-  Grid,
-  SimpleGrid,
-  Stack,
-  Text,
-  Title,
-} from "@mantine/core";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Separator } from "@/components/ui/separator";
 import dynamic from "next/dynamic";
 import {
   Bar,
@@ -43,75 +36,110 @@ export default function DashboardClient({
 }) {
   return (
     <main>
-      <Title order={2} mx="md" mb="md">
-        Welcome back, Mark 🐝
-      </Title>
+      <h2 className="text-2xl font-bold mb-6">Welcome back, Mark 🐝</h2>
 
-      <Grid gutter="xl">
-        <Grid.Col span={{ base: 12, md: 6 }}>
-          <Card shadow="sm" padding="lg" radius="md" withBorder>
-            <Title order={4}>To-Do List</Title>
-            <Divider my="sm" />
-            <Stack>
-              <Checkbox label="Organize file structure" defaultChecked />
-              <Checkbox label="Refactor all Widgets" />
-              <Checkbox label="Build a reuseable form" />
-              <Checkbox label="Separate all client and server logic" />
-              <Checkbox label="Make all forms and ui follow the same design" />
-              <Checkbox label="Paganate all pages the same way" />
-              <Checkbox label="Make button components reusable" />
-              <Checkbox label="Update the color palette" />
-            </Stack>
-          </Card>
-        </Grid.Col>
-        <Grid.Col span={{ base: 12, md: 6 }}>
-          <FinanceWidget />
-        </Grid.Col>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle>To-Do List</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <Separator className="mb-4" />
+            <div className="space-y-3">
+              <div className="flex items-center space-x-2">
+                <Checkbox defaultChecked />
+                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  Organize file structure
+                </label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox />
+                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  Refactor all Widgets
+                </label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox />
+                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  Build a reuseable form
+                </label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox />
+                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  Separate all client and server logic
+                </label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox />
+                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  Make all forms and ui follow the same design
+                </label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox />
+                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  Paganate all pages the same way
+                </label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox />
+                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  Make button components reusable
+                </label>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Checkbox />
+                <label className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  Update the color palette
+                </label>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
 
-        <Grid.Col span={{ base: 12, md: 6 }}>
-          <Card shadow="sm" padding="lg" radius="md" withBorder>
-            <Text fw={500} mb="xs">
-              Harvest Summary
-            </Text>
+        <FinanceWidget />
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Harvest Summary</CardTitle>
+          </CardHeader>
+          <CardContent>
             <ResponsiveContainer width="100%" height={200}>
               <BarChart data={chartData}>
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="harvest" fill="#f4b400" />
+                <Bar dataKey="harvest" fill="hsl(var(--primary))" />
               </BarChart>
             </ResponsiveContainer>
-          </Card>
-        </Grid.Col>
+          </CardContent>
+        </Card>
 
-        <Grid.Col span={{ base: 12, md: 6 }}>
-          <Card shadow="sm" padding="lg" radius="md" withBorder>
-            <SimpleGrid cols={2} spacing="lg">
+        <Card>
+          <CardContent className="pt-6">
+            <div className="grid grid-cols-2 gap-4">
               <div>
-                <Text fw={500}>Total Hives</Text>
-                <Title order={3}>{hiveCount}</Title>
+                <p className="font-medium text-muted-foreground">Total Hives</p>
+                <h3 className="text-2xl font-bold">{hiveCount}</h3>
               </div>
 
               <div>
-                <Text fw={500}>Swarms Traps Set</Text>
-                <Title order={3}>{swarmTrapCount}</Title>
+                <p className="font-medium text-muted-foreground">Swarms Traps Set</p>
+                <h3 className="text-2xl font-bold">{swarmTrapCount}</h3>
               </div>
 
               <div>
-                <Text fw={500}>Some Other Stat Test</Text>
-                <Title order={3}>XXXX</Title>
+                <p className="font-medium text-muted-foreground">Some Other Stat Test</p>
+                <h3 className="text-2xl font-bold">XXXX</h3>
               </div>
-            </SimpleGrid>
-          </Card>
-        </Grid.Col>
+            </div>
+          </CardContent>
+        </Card>
 
-        <Grid.Col span={{ base: 12, md: 6 }}>
-          <TrapMapWidget />
-        </Grid.Col>
-        <Grid.Col span={{ base: 12, md: 6 }}>
-          <QuickActionsWidget />
-        </Grid.Col>
-      </Grid>
+        <TrapMapWidget />
+        <QuickActionsWidget />
+      </div>
     </main>
   );
 }

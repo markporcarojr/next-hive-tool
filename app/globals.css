@@ -1,15 +1,31 @@
-/* File: styles/globals.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 @import "leaflet/dist/leaflet.css";
 
-/* Global CSS Variables (Light mode defaults) */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: 0 0% 100%;
+  --foreground: 222.2 84% 4.9%;
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 84% 4.9%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 84% 4.9%;
+  --primary: 44 96% 56%; /* Honey color */
+  --primary-foreground: 26 83% 14%;
+  --secondary: 210 40% 98%;
+  --secondary-foreground: 222.2 84% 4.9%;
+  --muted: 210 40% 98%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --accent: 210 40% 98%;
+  --accent-foreground: 222.2 84% 4.9%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 44 96% 56%; /* Honey color for focus ring */
+  --radius: 0.5rem;
 
-  /* Honey color palette */
+  /* Legacy honey color palette for gradual migration */
   --color-honey: #f4b400;
   --color-amber: #ffb703;
   --color-cream: #fff8e1;
@@ -17,23 +33,39 @@
   --color-deep: #3e2723;
 }
 
-/* Dark mode overrides */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    /* Optional: Add darker variants of honey palette here if needed */
-  }
+.dark {
+  --background: 222.2 84% 4.9%;
+  --foreground: 210 40% 98%;
+  --card: 222.2 84% 4.9%;
+  --card-foreground: 210 40% 98%;
+  --popover: 222.2 84% 4.9%;
+  --popover-foreground: 210 40% 98%;
+  --primary: 44 96% 56%;
+  --primary-foreground: 26 83% 14%;
+  --secondary: 217.2 32.6% 17.5%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 217.2 32.6% 17.5%;
+  --muted-foreground: 215 20.2% 65.1%;
+  --accent: 217.2 32.6% 17.5%;
+  --accent-foreground: 210 40% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 217.2 32.6% 17.5%;
+  --input: 217.2 32.6% 17.5%;
+  --ring: 44 96% 56%;
 }
 
-/* Body styling */
+* {
+  border-color: hsl(var(--border));
+}
+
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  font-feature-settings: "rlig" 1, "calt" 1;
 }
 
-/* Optional Honey Utility Classes */
+/* Legacy utility classes for gradual migration */
 .text-michgold {
   color: #f1c40f;
 }
